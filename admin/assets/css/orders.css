@@ -1,0 +1,30 @@
+/* admin/assets/css/orders.css */
+.text-accent-bold {
+    font-weight: bold;
+    color: var(--accent-color);
+}
+
+.text-gray {
+    color: #666;
+}
+
+.text-small-gray {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+.font-bold {
+    font-weight: bold;
+}
+
+.bg-purple {
+    background-color: #9b59b6;
+}
+
+.alert-custom-green {
+    background: #dcfce7;
+    color: #166534;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}

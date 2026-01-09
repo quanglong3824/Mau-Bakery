@@ -1,40 +1,18 @@
 <?php
-// admin/orders.php
-
-require_once 'includes/auth_check.php';
-require_once '../config/db.php';
-
-// Handle Action (Change Status)
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
-    $order_id = intval($_POST['order_id']);
-    $new_status = $_POST['new_status'];
-
-    // Validate status
-    $valid_statuses = ['pending', 'confirmed', 'shipping', 'completed', 'cancelled'];
-    if (in_array($new_status, $valid_statuses)) {
-        try {
-            $stmt = $conn->prepare("UPDATE orders SET status = :status WHERE id = :id");
-            $stmt->execute(['status' => $new_status, 'id' => $order_id]);
-            $msg = "Cập nhật trạng thái đơn hàng #ORD-$order_id thành công!";
-        } catch (PDOException $e) {
-            $error = "Lỗi: " . $e->getMessage();
-        }
-    }
-}
-
-// Fetch Orders
-$sql = "SELECT * FROM orders ORDER BY created_at DESC";
-$orders = $conn->query($sql)->fetchAll();
+session_start();
+// Include Controller
+require_once 'controllers/OrderManagerController.php';
 
 include 'includes/header.php';
 ?>
+<link rel="stylesheet" href="assets/css/orders.css">
 
 <div class="header-bar">
     <h1 class="page-title">Quản Lý Đơn Hàng</h1>
 </div>
 
 <?php if (isset($msg)): ?>
-    <div style="background: #dcfce7; color: #166534; padding: 15px; border-radius: 8px; margin-bottom: 20px;">
+    <div class="alert-custom-green">
         <i class="fas fa-check-circle"></i>
         <?php echo $msg; ?>
     </div>
@@ -78,17 +56,17 @@ include 'includes/header.php';
                 // I will use global .badge classes for consistency.
                 ?>
                 <tr>
-                    <td style="font-weight: bold;">#<?php echo $order['order_code']; ?></td>
+                    <td class="font-bold">#<?php echo $order['order_code']; ?></td>
                     <td>
                         <?php echo htmlspecialchars($order['recipient_name']); ?><br>
-                        <small style="color: #888;">
+                        <small class="text-small-gray">
                             <?php echo $order['recipient_phone']; ?>
                         </small>
                     </td>
-                    <td style="font-weight: bold; color: var(--accent-color);">
+                    <td class="text-accent-bold">
                         <?php echo number_format($order['total_amount'], 0, ',', '.'); ?>đ
                     </td>
-                    <td style="color: #666;">
+                    <td class="text-gray">
                         <?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?>
                     </td>
                     <td>
@@ -107,8 +85,8 @@ include 'includes/header.php';
                                     <i class="fas fa-check"></i>
                                 </button>
                             <?php elseif ($order['status'] == 'confirmed'): ?>
-                                <button type="submit" name="new_status" value="shipping" class="btn btn-sm btn-primary"
-                                    title="Giao hàng" style="background-color: #9b59b6;">
+                                <button type="submit" name="new_status" value="shipping"
+                                    class="btn btn-sm btn-primary bg-purple border-0" title="Giao hàng">
                                     <i class="fas fa-truck"></i>
                                 </button>
                             <?php elseif ($order['status'] == 'shipping'): ?>

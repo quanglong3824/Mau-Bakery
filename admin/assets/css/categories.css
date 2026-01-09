@@ -1,0 +1,8 @@
+/* admin/assets/css/categories.css */
+/* No specific inline CSS was found in categories.php besides some small utility styles that might be better in a global CSS or kept inline if very specific.
+   However, we can extract the modal styles if they are not global. */
+/* The modal overlay style is inline in the file. */
+.modal-overlay {
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+}

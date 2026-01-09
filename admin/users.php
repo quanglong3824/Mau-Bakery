@@ -1,27 +1,11 @@
 <?php
 session_start();
-require_once '../config/db.php';
-require_once 'includes/auth_check.php';
+// Include Controller
+require_once 'controllers/UserManagerController.php';
 
-$page_title = "Quản Lý Người Dùng";
 require_once 'includes/header.php';
-
-// Handle Actions (Ban/Delete)
-$message = "";
-if (isset($_POST['action'])) {
-    if ($_POST['action'] == 'toggle_status') {
-        $id = intval($_POST['id']);
-        $status = intval($_POST['status']); // 0 or 1
-        $conn->prepare("UPDATE users SET is_active = :status WHERE id = :id")->execute(['status' => $status, 'id' => $id]);
-        $message = "Đã cập nhật trạng thái người dùng.";
-    }
-}
-
-// Fetch Users
-$stmt = $conn->prepare("SELECT * FROM users ORDER BY created_at DESC");
-$stmt->execute();
-$users = $stmt->fetchAll();
 ?>
+<link rel="stylesheet" href="assets/css/users.css">
 
 <div class="admin-content">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -54,15 +38,14 @@ $users = $stmt->fetchAll();
                         </td>
                         <td>
                             <div class="d-flex align-items-center gap-2">
-                                <div
-                                    style="width: 40px; height: 40px; background: #eee; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #888; font-weight: bold;">
+                                <div class="user-avatar">
                                     <?php echo strtoupper(substr($u['username'], 0, 1)); ?>
                                 </div>
                                 <div>
-                                    <div style="font-weight: 600;">
+                                    <div class="user-name">
                                         <?php echo htmlspecialchars($u['full_name']); ?>
                                     </div>
-                                    <div style="font-size: 0.85rem; color: #888;">@
+                                    <div class="user-username">@
                                         <?php echo htmlspecialchars($u['username']); ?>
                                     </div>
                                 </div>

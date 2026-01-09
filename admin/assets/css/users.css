@@ -1,0 +1,22 @@
+/* admin/assets/css/users.css */
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: #eee;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.user-name {
+    font-weight: 600;
+}
+
+.user-username {
+    font-size: 0.85rem;
+    color: #888;
+}

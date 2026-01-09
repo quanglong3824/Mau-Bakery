@@ -1,0 +1,19 @@
+/* admin/assets/css/products.css */
+.lib-item {
+    cursor: pointer;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    overflow: hidden;
+    aspect-ratio: 1/1;
+}
+
+.lib-item:hover {
+    border-color: var(--accent-color);
+    opacity: 0.8;
+}
+
+.lib-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}

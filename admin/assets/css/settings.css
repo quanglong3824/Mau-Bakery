@@ -1,0 +1,16 @@
+/* admin/assets/css/settings.css */
+.text-secondary {
+    color: #57606f;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #eee;
+}
+
+.btn-warning {
+    background: #f39c12;
+}
+
+.btn-warning:hover {
+    background: #e67e22;
+}
