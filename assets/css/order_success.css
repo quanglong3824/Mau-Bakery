@@ -1,0 +1,119 @@
+/* Order Success Specific Styles */
+
+.success-container {
+    max-width: 800px;
+    margin: 40px auto;
+    text-align: center;
+}
+
+.success-icon-wrapper {
+    width: 100px;
+    height: 100px;
+    background: #4CAF50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 30px;
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+}
+
+.success-icon {
+    font-size: 3rem;
+    color: white;
+}
+
+@keyframes scaleIn {
+    from { transform: scale(0); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.order-id {
+    font-size: 1.2rem;
+    color: #666;
+    margin-bottom: 30px;
+    font-weight: 600;
+}
+
+.order-id span {
+    color: var(--accent-color);
+    background: rgba(177, 156, 217, 0.1);
+    padding: 5px 10px;
+    border-radius: 8px;
+}
+
+/* Order Info Grid */
+.order-info {
+    text-align: left;
+    margin-top: 40px;
+    border-top: 1px dashed rgba(0,0,0,0.1);
+    padding-top: 30px;
+}
+
+.info-group {
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-size: 0.9rem;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.info-content {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: var(--text-color);
+}
+
+.product-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.product-row:last-child {
+    border-bottom: none;
+}
+
+.success-actions {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 50px;
+}
+
+.btn-home {
+    background: transparent;
+    border: 2px solid var(--accent-color);
+    color: var(--accent-color);
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+}
+
+.btn-home:hover {
+    background: var(--accent-color);
+    color: white;
+}
+
+.btn-track {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-weight: 600;
+    box-shadow: 0 5px 15px rgba(177, 156, 217, 0.4);
+}
+
+.btn-track:hover {
+    background: #9b85c1;
+    transform: translateY(-2px);
+}

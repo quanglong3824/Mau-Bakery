@@ -1,0 +1,229 @@
+/* Mobile Specific Styles - Refined Luxury - FAB Style */
+
+/* Hide mobile button by default on Desktop */
+@media (min-width: 769px) {
+    .mobile-menu-btn, .mobile-menu-overlay {
+        display: none !important;
+    }
+}
+
+/* Mobile & Tablet Styles */
+@media (max-width: 768px) {
+    /* 1. Header & Navigation Refinements */
+    .nav-links {
+        display: none; /* Hide standard nav links */
+    }
+
+    .desktop-only {
+        display: none !important; /* Hide desktop-specific buttons */
+    }
+
+    .top-bar {
+        display: none; /* Hide top bar on mobile for cleaner look */
+    }
+
+    header .container {
+        padding: 10px 15px; /* Reduce padding */
+    }
+
+    header nav.glass-panel {
+        padding: 10px 20px !important;
+        border-radius: 30px !important; /* Softer radius */
+    }
+
+    .logo {
+        font-size: 1.4rem; /* Smaller logo */
+    }
+
+    /* 2. Floating Action Button (FAB) Trigger */
+    .mobile-menu-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(255, 209, 220, 0.9); /* Warm pink gold tone */
+        border: 2px solid white;
+        backdrop-filter: blur(10px);
+        box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+        cursor: pointer;
+        z-index: 2002; /* Top most */
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        
+        /* Fixed Position */
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        color: white;
+    }
+
+    .mobile-menu-btn i {
+        font-size: 1.4rem;
+        transition: transform 0.3s ease;
+    }
+
+    /* Active state for button (Rotates icon) */
+    .mobile-menu-btn.active {
+        transform: rotate(45deg); /* Plus becomes Cross */
+        background: #333; /* Dark when open for high contrast */
+        border-color: #555;
+    }
+    
+    /* 3. FAB Menu Items Overlay (Full screen backdrop) */
+    .mobile-menu-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100vh;
+        background: rgba(255, 255, 255, 0.6); /* Subtle backdrop */
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 2001; /* Below button (2002) */
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end; /* Align items to bottom */
+        align-items: flex-end; /* Align items to right */
+        padding: 20px 30px 90px 30px; /* Padding for items, leave space for button at bottom */
+        pointer-events: none; /* Default: click through */
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .mobile-menu-overlay.active {
+        pointer-events: auto; /* Catch clicks */
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .mobile-menu-items {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-end;
+    }
+
+    .fab-item {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        opacity: 0;
+        transform: translateY(20px) scale(0.8);
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        pointer-events: auto; /* Re-enable clicks */
+    }
+    
+    .mobile-menu-overlay.active .fab-item {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+    
+    /* Staggered Delay */
+    .mobile-menu-overlay.active .fab-item:nth-last-child(1) { transition-delay: 0.05s; }
+    .mobile-menu-overlay.active .fab-item:nth-last-child(2) { transition-delay: 0.1s; }
+    .mobile-menu-overlay.active .fab-item:nth-last-child(3) { transition-delay: 0.15s; }
+    .mobile-menu-overlay.active .fab-item:nth-last-child(4) { transition-delay: 0.2s; }
+    .mobile-menu-overlay.active .fab-item:nth-last-child(5) { transition-delay: 0.25s; }
+
+    .fab-label {
+        background: rgba(0, 0, 0, 0.7); /* Dark semi-transparent pill */
+        color: white;
+        padding: 6px 15px;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+        backdrop-filter: blur(5px);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .fab-icon-circle {
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #333;
+        font-size: 1.1rem;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+    }
+    
+    .fab-item:hover .fab-icon-circle {
+        background: var(--accent-color);
+        color: white;
+        transform: scale(1.1);
+    }
+
+    /* Hide unused elements from previous generic menu */
+    .close-menu-btn, .mobile-link, .glass-orb {
+        display: none !important;
+    }
+
+    /* 4. Content Adjustments */
+    .hero {
+        flex-direction: column-reverse;
+        padding-top: 20px;
+        text-align: center;
+        min-height: auto;
+    }
+
+    .hero-content {
+        padding-right: 0;
+        margin-top: 30px;
+    }
+
+    .hero-title {
+        font-size: 2.2rem; /* Adjusted for mobile */
+    }
+    
+    .hero-desc {
+        font-size: 1rem;
+        padding: 0 15px;
+    }
+
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr); /* 2 Columns grid */
+        gap: 15px;
+    }
+    
+    .product-card {
+        padding: 15px;
+    }
+
+    .product-img {
+        width: 120px;
+        height: 120px;
+        margin-bottom: 10px;
+    }
+    
+    .product-name {
+        font-size: 1rem;
+    }
+    
+    .product-price {
+        font-size: 0.95rem;
+    }
+
+    .section-title {
+        font-size: 1.8rem;
+    }
+    
+    .glass-panel {
+        border-radius: 20px; /* Smaller radius on mobile */
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr; /* 1 Column on very small screens */
+    }
+    .hero-image img {
+        width: 80%; /* Reduce hero image size */
+    }
+}
