@@ -26,7 +26,7 @@ require_once 'controllers/VoucherController.php';
                         <span style="font-weight: 700; font-size: 1.2rem; color: var(--accent-color);">
                             <?php echo $voucher['discount']; ?>
                         </span>
-                        <button class="btn-copy" onclick="alert('Đã sao chép mã: <?php echo $voucher['code']; ?>')"
+                        <button class="btn-copy" onclick="copyVoucher('<?php echo $voucher['code']; ?>')"
                             style="border: 1px solid var(--accent-color); background: white; color: var(--accent-color); border-radius: 5px; cursor: pointer; font-size: 0.8rem; padding: 2px 8px;">Copy</button>
                     </div>
                     <p style="font-size: 0.9rem; margin-bottom: 5px;">
@@ -73,20 +73,5 @@ require_once 'controllers/VoucherController.php';
 
 </div>
 
-<style>
-    @media (max-width: 768px) {
-        .promo-panel {
-            flex-direction: column !important;
-            height: auto !important;
-        }
-
-        .promo-panel>div {
-            width: 100% !important;
-        }
-
-        .promo-panel img {
-            position: static !important;
-            height: 200px !important;
-        }
-    }
-</style>
+<link rel="stylesheet" href="assets/css/vouchers.css">
+<script src="assets/js/vouchers.js"></script>

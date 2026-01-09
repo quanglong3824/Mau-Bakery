@@ -1,0 +1,15 @@
+@media (max-width: 768px) {
+  .promo-panel {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+
+  .promo-panel > div {
+    width: 100% !important;
+  }
+
+  .promo-panel img {
+    position: static !important;
+    height: 200px !important;
+  }
+}

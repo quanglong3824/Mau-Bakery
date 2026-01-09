@@ -34,32 +34,19 @@
         </div>
     </div>
 
-    <!-- Team Section -->
-    <h2 class="section-title text-center">Đội Ngũ Đầu Bếp</h2>
-    <div class="product-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));">
-        <!-- Chef 1 -->
-        <div class="glass-panel product-card">
-            <img src="https://images.unsplash.com/photo-1583394293214-28ded15ee548?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80"
-                alt="Chef" class="product-img"
-                style="border-radius: 20px; width: 100%; height: 250px; margin-top: 20px;">
-            <h3 class="product-name" style="margin-top: 15px;">Nguyễn Văn A</h3>
-            <p style="color: #666; font-style: italic;">Bếp Trưởng</p>
+    <!-- Student Section -->
+    <h2 class="section-title text-center">Sinh Viên Thực Hiện</h2>
+    <div class="product-grid"
+        style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); justify-content: center;">
+        <!-- Student 1 -->
+        <div class="glass-panel product-card" style="padding: 40px 20px;">
+            <h3 class="product-name" style="margin-top: 0;">Nguyễn Thị Phương Thảo</h3>
+            <p style="color: #666; font-style: italic; margin-bottom: 0;">Sinh viên</p>
         </div>
-        <!-- Chef 2 -->
-        <div class="glass-panel product-card">
-            <img src="https://images.unsplash.com/photo-1577219491135-ce391730fb2c?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80"
-                alt="Chef" class="product-img"
-                style="border-radius: 20px; width: 100%; height: 250px; margin-top: 20px;">
-            <h3 class="product-name" style="margin-top: 15px;">Trần Thị B</h3>
-            <p style="color: #666; font-style: italic;">Chuyên gia trang trí</p>
-        </div>
-        <!-- Chef 3 -->
-        <div class="glass-panel product-card">
-            <img src="https://images.unsplash.com/photo-1595273670150-bd0c3c392e46?ixlib=rb-1.2.1&auto=format&fit=crop&w=400&q=80"
-                alt="Chef" class="product-img"
-                style="border-radius: 20px; width: 100%; height: 250px; margin-top: 20px;">
-            <h3 class="product-name" style="margin-top: 15px;">Lê Văn C</h3>
-            <p style="color: #666; font-style: italic;">Thợ làm bánh</p>
+        <!-- Student 2 -->
+        <div class="glass-panel product-card" style="padding: 40px 20px;">
+            <h3 class="product-name" style="margin-top: 0;">Lý Tú Tâm</h3>
+            <p style="color: #666; font-style: italic; margin-bottom: 0;">Sinh viên</p>
         </div>
     </div>
 </div>

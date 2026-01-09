@@ -1,103 +1,6 @@
 <?php
-// views/order_detail.php
-
-// Ensure user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo "<script>window.location.href='auth/login.php';</script>";
-    exit;
-}
-
-// Handle Review Submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'submit_review') {
-    $product_id = intval($_POST['product_id']);
-    $rating = intval($_POST['rating']);
-    $comment = trim($_POST['comment']);
-    $user_id = $_SESSION['user_id'];
-
-    if ($product_id > 0 && $rating >= 1 && $rating <= 5) {
-        try {
-            $stmt = $conn->prepare("INSERT INTO reviews (user_id, product_id, rating, comment) VALUES (:uid, :pid, :rating, :comment)");
-            $stmt->execute([
-                'uid' => $user_id,
-                'pid' => $product_id,
-                'rating' => $rating,
-                'comment' => $comment
-            ]);
-            $msg_review = "Cảm ơn bạn đã đánh giá sản phẩm!";
-        } catch (PDOException $e) {
-            $err_review = "Lỗi: " . $e->getMessage();
-        }
-    }
-}
-
-// Get Order ID
-$order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$order = null;
-
-if (isset($conn) && $order_id > 0) {
-    // 1. Fetch Order Data (Security: Check user_id matches session)
-    $stmt = $conn->prepare("SELECT * FROM orders WHERE id = :id AND user_id = :user_id");
-    $stmt->execute(['id' => $order_id, 'user_id' => $_SESSION['user_id']]);
-    $order_data = $stmt->fetch();
-
-    if ($order_data) {
-        // 2. Fetch Order Items
-        $stmt_items = $conn->prepare("SELECT * FROM order_items WHERE order_id = :id");
-        $stmt_items->execute(['id' => $order_id]);
-        $items = $stmt_items->fetchAll();
-
-        // 3. Map to View Structure
-        $order = [
-            'id' => $order_data['id'],
-            'code' => $order_data['order_code'],
-            'date' => date('d/m/Y H:i', strtotime($order_data['created_at'])),
-            'status' => $order_data['status'],
-            'payment_method' => $order_data['payment_method'],
-            'payment_status' => $order_data['payment_status'],
-            'shipping_method' => $order_data['shipping_fee'] > 30000 ? 'Giao hàng hỏa tốc' : 'Giao hàng tiêu chuẩn',
-            'customer' => [
-                'name' => $order_data['recipient_name'],
-                'phone' => $order_data['recipient_phone'],
-                'address' => $order_data['shipping_address'],
-                'note' => $order_data['note']
-            ],
-            'items' => [],
-            'subtotal' => $order_data['total_amount'] - $order_data['shipping_fee'] + $order_data['discount_amount'], // approximate reverse calc
-            'shipping_fee' => $order_data['shipping_fee'],
-            'discount' => $order_data['discount_amount'],
-            'total' => $order_data['total_amount']
-        ];
-
-        foreach ($items as $item) {
-            // We might not have image here if not joined with products. 
-            // Ideally we should join. Let's do a quick fetch or join in query.
-            // For now let's assume valid product_id to fetch image.
-            $img = 'assets/images/default-cake.jpg'; // Fallback
-            $stmt_prod = $conn->prepare("SELECT image FROM products WHERE id = :pid");
-            $stmt_prod->execute(['pid' => $item['product_id']]);
-            $p = $stmt_prod->fetch();
-            if ($p)
-                $img = $p['image'];
-
-            // Fetch Reviews by this user for these products to check if already reviewed
-            $reviewed_products = [];
-            $stmt_reviews = $conn->prepare("SELECT product_id FROM reviews WHERE user_id = :uid");
-            $stmt_reviews->execute(['uid' => $_SESSION['user_id']]);
-            $reviewed_products = $stmt_reviews->fetchAll(PDO::FETCH_COLUMN);
-
-            $order['items'][] = [
-                'product_id' => $item['product_id'], // Need this for rating
-                'name' => $item['product_name'],
-                'image' => $img,
-                'size' => $item['size'],
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'is_reviewed' => in_array($item['product_id'], $reviewed_products)
-            ];
-        }
-    }
-}
-
+require_once 'controllers/OrderDetailController.php';
+?>
 if (!$order) {
     echo "<div class='container mt-2'><h3>Đơn hàng không tồn tại hoặc bạn không có quyền truy cập!</h3><a href='index.php?page=profile'>Về tài khoản</a></div>";
     return;
@@ -340,7 +243,7 @@ if (!$order) {
         <div class="order-footer">
             <div class="order-actions">
                 <?php if ($order['status'] == 'pending'): ?>
-                    <button class="btn-cancel" onclick="alert('Tính năng hủy đang phát triển')">Hủy đơn hàng</button>
+                    <button class="btn-cancel" onclick="cancelOrder()">Hủy đơn hàng</button>
                 <?php endif; ?>
 
                 <?php if ($order['status'] == 'completed'): ?>
@@ -432,60 +335,4 @@ if (!$order) {
     </div>
 </div>
 
-<style>
-    @keyframes slideDown {
-        from {
-            transform: translateY(-30px);
-            opacity: 0;
-        }
-
-        to {
-            transform: translateY(0);
-            opacity: 1;
-        }
-    }
-
-    .star-rating {
-        display: inline-flex;
-        flex-direction: row-reverse;
-        gap: 5px;
-    }
-
-    .star-rating input {
-        display: none;
-    }
-
-    .star-rating label {
-        font-size: 2.5rem;
-        color: #ddd;
-        cursor: pointer;
-        transition: color 0.2s;
-        line-height: 1;
-    }
-
-    .star-rating input:checked~label,
-    .star-rating label:hover,
-    .star-rating label:hover~label {
-        color: #ffd700;
-        text-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
-    }
-</style>
-
-<script>
-    function openReviewModal(pid, pname) {
-        document.getElementById('reviewModal').style.display = 'flex';
-        document.getElementById('reviewProductId').value = pid;
-        document.getElementById('reviewProductName').innerText = pname;
-    }
-
-    function closeReviewModal() {
-        document.getElementById('reviewModal').style.display = 'none';
-    }
-
-    window.onclick = function (event) {
-        var modal = document.getElementById('reviewModal');
-        if (event.target == modal) {
-            closeReviewModal();
-        }
-    }
-</script>
+<script src="assets/js/order_detail.js"></script>

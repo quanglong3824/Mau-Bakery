@@ -1,20 +1,5 @@
 <?php
-// views/cart.php
-
-// Ensure cart session exists
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
-
-$cart_items = $_SESSION['cart'];
-$subtotal = 0;
-foreach ($cart_items as $item) {
-    $subtotal += $item['price'] * $item['quantity'];
-}
-$shipping = 30000;
-$total = $subtotal + $shipping;
-
-$is_logged_in = isset($_SESSION['user_id']); // Check actual session
+require_once 'controllers/CartViewController.php';
 ?>
 
 <div class="container mt-2 mb-2">
@@ -150,47 +135,4 @@ $is_logged_in = isset($_SESSION['user_id']); // Check actual session
     <?php endif; ?>
 </div>
 
-<script>
-    function updateCart(index, newQuantity) {
-        if (newQuantity < 1) {
-            if (!confirm('Bạn có muốn xóa sản phẩm này khỏi giỏ hàng?')) return;
-            removeFromCart(index);
-            return;
-        }
-
-        const formData = new FormData();
-        formData.append('action', 'update_cart');
-        formData.append('index', index);
-        formData.append('quantity', newQuantity);
-
-        fetch('index.php?page=cart_action', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    location.reload(); // Reload to update totals simply
-                }
-            });
-    }
-
-    function removeFromCart(index) {
-        if (!confirm('Xác nhận xóa sản phẩm này?')) return;
-
-        const formData = new FormData();
-        formData.append('action', 'remove_from_cart');
-        formData.append('index', index);
-
-        fetch('index.php?page=cart_action', {
-            method: 'POST',
-            body: formData
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    location.reload();
-                }
-            });
-    }
-</script>
+<script src="assets/js/cart.js"></script>

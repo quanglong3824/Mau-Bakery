@@ -1,15 +1,5 @@
 <?php
-// Fetch Featured Products from Database
-$products = [];
-if (isset($conn)) {
-    try {
-        $stmt = $conn->prepare("SELECT * FROM products WHERE is_active = 1 AND is_featured = 1 LIMIT 4");
-        $stmt->execute();
-        $products = $stmt->fetchAll();
-    } catch (PDOException $e) {
-        echo "<!-- Error fetching products: " . $e->getMessage() . " -->";
-    }
-}
+require_once 'controllers/HomeController.php';
 ?>
 
 <main>
@@ -29,8 +19,7 @@ if (isset($conn)) {
             <div class="glass-bg"
                 style="position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.2); border-radius: 50%; filter: blur(40px); z-index: -1;">
             </div>
-            <img src="https://images.unsplash.com/photo-1557308536-ee471ef2c39a?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                alt="Premium Berry Cake" class="hero-main-img">
+            <img src="uploads/banh-kem-dau-tay.jpg" alt="Premium Berry Cake" class="hero-main-img">
         </div>
     </section>
 
@@ -74,7 +63,7 @@ if (isset($conn)) {
                 <a href="auth/register.php" class="btn-glass btn-primary">Đăng Ký Ngay</a>
             </div>
             <div style="flex: 1; text-align: right; z-index: 1;">
-                <img src="https://images.unsplash.com/photo-1621303837174-89787a7d4729?ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=80"
+                <img src="uploads/banh-kem-socola-kem-bong-lan.jpg"
                     style="width: 300px; border-radius: 20px; transform: rotate(10deg);" alt="Promotion">
             </div>
 

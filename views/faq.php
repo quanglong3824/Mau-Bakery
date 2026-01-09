@@ -1,43 +1,5 @@
 <?php
-// views/faq.php
-
-$faqs_grouped = [];
-
-if (isset($conn)) {
-    try {
-        // Fetch FAQs ordered by category and sort order
-        $stmt = $conn->prepare("SELECT * FROM faqs ORDER BY category, sort_order ASC");
-        $stmt->execute();
-        $all_faqs = $stmt->fetchAll();
-
-        // Group by category
-        foreach ($all_faqs as $faq) {
-            $cat = $faq['category']; // e.g., 'delivery', 'product', 'payment'
-            
-            // Map keys to readable titles
-            $cat_titles = [
-                'delivery' => 'Giao Hàng & Vận Chuyển',
-                'product'  => 'Sản Phẩm & Bảo Quản',
-                'payment'  => 'Thanh Toán & Đổi Trả',
-                'general'  => 'Câu Hỏi Chung'
-            ];
-            $title = $cat_titles[$cat] ?? ucfirst($cat);
-
-            if (!isset($faqs_grouped[$cat])) {
-                $faqs_grouped[$cat] = [
-                    'title' => $title,
-                    'items' => []
-                ];
-            }
-            $faqs_grouped[$cat]['items'][] = [
-                'q' => $faq['question'],
-                'a' => $faq['answer']
-            ];
-        }
-    } catch (PDOException $e) {
-        // Fallback or specific error handling
-    }
-}
+require_once 'controllers/FaqController.php';
 ?>
 
 <div class="container mt-2 mb-2">
@@ -57,7 +19,7 @@ if (isset($conn)) {
 
     <div style="max-width: 800px; margin: 0 auto;">
 
-        <?php if(empty($faqs_grouped)): ?>
+        <?php if (empty($faqs_grouped)): ?>
             <div class="text-center glass-panel" style="padding: 40px;">
                 <p>Hiện chưa có câu hỏi thường gặp nào.</p>
             </div>
@@ -97,38 +59,5 @@ if (isset($conn)) {
     </div>
 </div>
 
-<style>
-    details[open] {
-        background: white !important;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-    }
-
-    details[open] summary i {
-        transform: rotate(180deg);
-    }
-</style>
-
-<script>
-    // Simple FAQ Search
-    document.getElementById('faq-search').addEventListener('input', function(e) {
-        const term = e.target.value.toLowerCase();
-        const cats = document.querySelectorAll('.faq-category');
-        
-        cats.forEach(cat => {
-            let hasVisible = false;
-            const items = cat.querySelectorAll('.faq-item');
-            
-            items.forEach(item => {
-                const q = item.querySelector('.faq-question').innerText.toLowerCase();
-                if(q.includes(term)) {
-                    item.style.display = 'block';
-                    hasVisible = true;
-                } else {
-                    item.style.display = 'none';
-                }
-            });
-            
-            cat.style.display = hasVisible ? 'block' : 'none';
-        });
-    });
-</script>
+<link rel="stylesheet" href="assets/css/faq.css">
+<script src="assets/js/faq.js"></script>

@@ -1,0 +1,8 @@
+details[open] {
+    background: white !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+}
+
+details[open] summary i {
+    transform: rotate(180deg);
+}
