@@ -11,11 +11,59 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
 
     $recipient_name = trim($_POST['fullname']);
     $recipient_phone = trim($_POST['phone']);
-    $shipping_address = trim($_POST['address']);
     $email = trim($_POST['email']); // Optional
     $note = trim($_POST['note']);
     $payment_method = $_POST['payment_method'];
-    $shipping_method = $_POST['shipping_method'];
+
+    // Handle Address Mapping
+    $city = isset($_POST['city']) ? trim($_POST['city']) : 'TP. Hồ Chí Minh';
+    $district_code = isset($_POST['district']) ? $_POST['district'] : '';
+    $address_specific = isset($_POST['address_specific']) ? trim($_POST['address_specific']) : '';
+
+    // Define Fees logic (Same as View for validation)
+    $districts_data = [
+        'Q1' => ['name' => 'Quận 1', 'fee' => 15000],
+        'Q3' => ['name' => 'Quận 3', 'fee' => 15000],
+        'Q4' => ['name' => 'Quận 4', 'fee' => 15000],
+        'Q5' => ['name' => 'Quận 5', 'fee' => 15000],
+        'Q10' => ['name' => 'Quận 10', 'fee' => 15000],
+        'BINHTHANH' => ['name' => 'Quận Bình Thạnh', 'fee' => 15000],
+        'PHUNHUAN' => ['name' => 'Quận Phú Nhuận', 'fee' => 15000],
+
+        'Q6' => ['name' => 'Quận 6', 'fee' => 30000],
+        'Q7' => ['name' => 'Quận 7', 'fee' => 30000],
+        'Q8' => ['name' => 'Quận 8', 'fee' => 30000],
+        'Q11' => ['name' => 'Quận 11', 'fee' => 30000],
+        'TANBINH' => ['name' => 'Quận Tân Bình', 'fee' => 30000],
+        'GOVAP' => ['name' => 'Quận Gò Vấp', 'fee' => 30000],
+        'TANPHU' => ['name' => 'Quận Tân Phú', 'fee' => 30000],
+
+        'Q12' => ['name' => 'Quận 12', 'fee' => 50000],
+        'BINHTAN' => ['name' => 'Quận Bình Tân', 'fee' => 50000],
+        'THUDUC' => ['name' => 'TP. Thủ Đức', 'fee' => 50000],
+
+        'BINHCHANH' => ['name' => 'Huyện Bình Chánh', 'fee' => 60000],
+        'HOCMON' => ['name' => 'Huyện Hóc Môn', 'fee' => 60000],
+        'NHABE' => ['name' => 'Huyện Nhà Bè', 'fee' => 60000],
+        'CUCHI' => ['name' => 'Huyện Củ Chi', 'fee' => 70000],
+        'CANGIO' => ['name' => 'Huyện Cần Giờ', 'fee' => 100000],
+    ];
+
+    // Validate District and Get Fee
+    $shipping_fee = 0;
+    $district_name = '';
+
+    if (array_key_exists($district_code, $districts_data)) {
+        $shipping_fee = $districts_data[$district_code]['fee'];
+        $district_name = $districts_data[$district_code]['name'];
+    } else {
+        // Fallback for invalid district
+        $shipping_fee = 30000;
+        $district_name = $district_code;
+    }
+
+    // Compose Full Address for DB
+    $shipping_address = $address_specific . ", " . $district_name . ", " . $city;
 
     // Calculate Totals
     $subtotal = 0;
@@ -23,7 +71,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         $subtotal += $item['price'] * $item['quantity'];
     }
 
-    $shipping_fee = ($shipping_method === 'express') ? 50000 : 30000;
     $total_amount = $subtotal + $shipping_fee;
 
     // Generate Order Code

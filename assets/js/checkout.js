@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // 1. Handle Payment Method Selection Styling
     const paymentRadios = document.querySelectorAll('input[name="payment_method"]');
-    const paymentCards = document.querySelectorAll('.payment-card'); // If we use specific class
     
     // Helper to update active class on parent
     function updateActiveRadio(radios) {
@@ -18,18 +17,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // Initialize
+    // Initialize Payment Radios
     updateActiveRadio(document.querySelectorAll('.radio-input'));
 
-    // Listen
+    // Listen for Payment Method Change
     document.body.addEventListener('change', function(e) {
-        if(e.target.classList.contains('radio-input')) {
-             updateActiveRadio(document.querySelectorAll('input[name="' + e.target.name + '"]'));
-             
-             // If Shipping changed, update total
-             if(e.target.name === 'shipping_method') {
-                 updateTotal(e.target);
-             }
+        if(e.target.classList.contains('radio-input') && e.target.name === 'payment_method') {
+             updateActiveRadio(document.querySelectorAll('input[name="payment_method"]'));
         }
     });
 
@@ -42,23 +36,41 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 3. Update Total Logic
+    // 3. Update Total Logic (Based on District)
+    const districtSelect = document.getElementById('district-select');
     const subtotalEl = document.getElementById('checkout-subtotal');
     const shippingEl = document.getElementById('checkout-shipping');
     const totalEl = document.getElementById('checkout-total');
+    const hiddenShippingEl = document.getElementById('hidden_shipping_fee');
     
-    function updateTotal(shippingInput) {
-        const shippingCost = parseInt(shippingInput.getAttribute('data-price'));
-        const subtotal = parseInt(subtotalEl.getAttribute('data-amount')); // We need to set this in PHP
+    function recalculateTotal() {
+        // Get fee from selected option
+        const selectedOption = districtSelect.options[districtSelect.selectedIndex];
+        const shippingFee = parseInt(selectedOption.getAttribute('data-fee')) || 0;
         
-        const total = subtotal + shippingCost;
+        // Get Subtotal
+        const subtotal = parseInt(subtotalEl.getAttribute('data-amount'));
+        
+        // Calculate Total
+        const total = subtotal + shippingFee;
         
         // Update DOM
-        shippingEl.innerText = new Intl.NumberFormat('vi-VN').format(shippingCost) + 'đ';
+        shippingEl.innerText = new Intl.NumberFormat('vi-VN').format(shippingFee) + 'đ';
         totalEl.innerText = new Intl.NumberFormat('vi-VN').format(total) + 'đ';
+        
+        // Update hidden input if exists
+        if(hiddenShippingEl) hiddenShippingEl.value = shippingFee;
         
         // Update total data attr
         totalEl.setAttribute('data-amount', total);
     }
+
+    // Listen for District Change
+    if(districtSelect) {
+        districtSelect.addEventListener('change', recalculateTotal);
+    }
+    
+    // Initial Calc (To ensure numbers are formatted)
+    recalculateTotal();
 
 });

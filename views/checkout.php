@@ -1,5 +1,35 @@
 <?php
 require_once 'controllers/CheckoutViewController.php';
+
+// Define Shipping Zones & Fees (Hardcoded for HCMC)
+$districts_data = [
+    'Q1' => ['name' => 'Quận 1', 'fee' => 15000],
+    'Q3' => ['name' => 'Quận 3', 'fee' => 15000],
+    'Q4' => ['name' => 'Quận 4', 'fee' => 15000],
+    'Q5' => ['name' => 'Quận 5', 'fee' => 15000],
+    'Q10' => ['name' => 'Quận 10', 'fee' => 15000],
+    'BINHTHANH' => ['name' => 'Quận Bình Thạnh', 'fee' => 15000],
+    'PHUNHUAN' => ['name' => 'Quận Phú Nhuận', 'fee' => 15000],
+
+    'Q6' => ['name' => 'Quận 6', 'fee' => 30000],
+    'Q7' => ['name' => 'Quận 7', 'fee' => 30000],
+    'Q8' => ['name' => 'Quận 8', 'fee' => 30000],
+    'Q11' => ['name' => 'Quận 11', 'fee' => 30000],
+    'TANBINH' => ['name' => 'Quận Tân Bình', 'fee' => 30000],
+    'GOVAP' => ['name' => 'Quận Gò Vấp', 'fee' => 30000],
+    'TANPHU' => ['name' => 'Quận Tân Phú', 'fee' => 30000],
+
+    'Q12' => ['name' => 'Quận 12', 'fee' => 50000],
+    'BINHTAN' => ['name' => 'Quận Bình Tân', 'fee' => 50000],
+    'THUDUC' => ['name' => 'TP. Thủ Đức', 'fee' => 50000],
+
+    'BINHCHANH' => ['name' => 'Huyện Bình Chánh', 'fee' => 60000],
+    'HOCMON' => ['name' => 'Huyện Hóc Môn', 'fee' => 60000],
+    'NHABE' => ['name' => 'Huyện Nhà Bè', 'fee' => 60000],
+    'CUCHI' => ['name' => 'Huyện Củ Chi', 'fee' => 70000],
+    'CANGIO' => ['name' => 'Huyện Cần Giờ', 'fee' => 100000],
+];
+
 ?>
 
 <!-- Load Checkout Assets -->
@@ -39,12 +69,35 @@ require_once 'controllers/CheckoutViewController.php';
                         <input type="email" class="form-input" name="email" placeholder="example@email.com"
                             value="<?php echo htmlspecialchars($user_email); ?>">
                     </div>
+
+                    <!-- Split Address Section -->
+                    <div class="form-group">
+                        <label class="form-label">Thành phố</label>
+                        <input type="text" class="form-input" value="TP. Hồ Chí Minh" readonly
+                            style="background: #f5f5f5; cursor: not-allowed; color: #777;">
+                        <input type="hidden" name="city" value="TP. Hồ Chí Minh">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Quận / Huyện *</label>
+                        <select class="form-input" name="district" id="district-select" required>
+                            <option value="" data-fee="0">-- Chọn Quận/Huyện --</option>
+                            <?php foreach ($districts_data as $code => $data): ?>
+                                <option value="<?php echo $code; ?>" data-fee="<?php echo $data['fee']; ?>">
+                                    <?php echo $data['name']; ?> - Ship:
+                                    <?php echo number_format($data['fee'], 0, ',', '.'); ?>đ
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+
                     <div class="form-group full-width">
-                        <label class="form-label">Địa chỉ nhận hàng *</label>
-                        <input type="text" class="form-input" name="address"
-                            placeholder="Số nhà, tên đường, phường/xã, quận/huyện..."
+                        <label class="form-label">Địa chỉ cụ thể *</label>
+                        <input type="text" class="form-input" name="address_specific"
+                            placeholder="Số nhà, tên đường, phường/xã..."
                             value="<?php echo htmlspecialchars($user_address); ?>" required>
                     </div>
+
                     <div class="form-group full-width">
                         <label class="form-label">Ghi chú đơn hàng (Tùy chọn)</label>
                         <textarea class="form-input form-textarea" name="note"
@@ -53,42 +106,16 @@ require_once 'controllers/CheckoutViewController.php';
                 </div>
             </div>
 
-            <!-- Step 2: Shipping Method -->
-            <div class="glass-panel" style="padding: 30px; margin-bottom: 30px;">
-                <div class="step-header">
-                    <div class="step-number">2</div>
-                    <h3 class="step-title">Phương Thức Vận Chuyển</h3>
-                </div>
-
-                <div class="shipping-options">
-                    <label class="radio-card active">
-                        <input type="radio" name="shipping_method" value="standard" class="radio-input"
-                            data-price="30000" checked>
-                        <div class="radio-info">
-                            <span class="radio-title">Giao Hàng Tiêu Chuẩn</span>
-                            <span class="radio-desc">Giao trong 2-3 ngày làm việc</span>
-                        </div>
-                        <div class="radio-price">30.000đ</div>
-                    </label>
-
-                    <label class="radio-card">
-                        <input type="radio" name="shipping_method" value="express" class="radio-input"
-                            data-price="50000">
-                        <div class="radio-info">
-                            <span class="radio-title">Giao Hàng Hỏa Tốc</span>
-                            <span class="radio-desc">Nhận hàng trong vòng 2H (Nội thành)</span>
-                        </div>
-                        <div class="radio-price">50.000đ</div>
-                    </label>
-                </div>
-            </div>
-
-            <!-- Step 3: Payment Method -->
+            <!-- Step 2: Payment Method (Renumbered, Shipping selection removed) -->
             <div class="glass-panel" style="padding: 30px;">
                 <div class="step-header">
-                    <div class="step-number">3</div>
+                    <div class="step-number">2</div>
                     <h3 class="step-title">Phương Thức Thanh Toán</h3>
                 </div>
+
+                <!-- Hidden input for shipping fee logic if needed, though handled by district select -->
+                <input type="hidden" name="shipping_fee" id="hidden_shipping_fee" value="0">
+
 
                 <div class="shipping-options">
                     <label class="radio-card active">
@@ -166,8 +193,9 @@ require_once 'controllers/CheckoutViewController.php';
                 </div>
                 <div class="summary-row">
                     <span>Phí vận chuyển</span>
-                    <span id="checkout-shipping">30.000đ</span>
+                    <span id="checkout-shipping">0đ</span>
                 </div>
+
 
                 <div class="summary-row total">
                     <span>Tổng cộng</span>
