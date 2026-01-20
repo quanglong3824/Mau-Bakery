@@ -1,22 +1,123 @@
 /* admin/assets/css/users.css */
+
+/* Table Styles - Ensure consistency */
 .user-avatar {
-    width: 40px;
-    height: 40px;
-    background: #eee;
+    width: 35px;
+    height: 35px;
+    background: var(--primary-color);
+    color: white;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #888;
     font-weight: bold;
-    text-transform: uppercase;
+    font-size: 0.9rem;
 }
 
 .user-name {
     font-weight: 600;
+    color: var(--text-color);
 }
 
 .user-username {
     font-size: 0.85rem;
-    color: #888;
+    color: #777;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 5px;
+}
+
+/* Modal Styles */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal-overlay.active {
+    display: flex;
+    opacity: 1;
+}
+
+.modal-box {
+    width: 90%;
+    max-width: 500px;
+    background: white;
+    padding: 25px;
+    border-radius: 15px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.modal-overlay.active .modal-box {
+    transform: translateY(0);
+}
+
+.modal-title {
+    margin-bottom: 20px;
+    color: var(--primary-color);
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+    font-size: 1.25rem;
+    font-weight: 700;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #555;
+}
+
+.form-control {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: border-color 0.3s;
+}
+
+.form-control:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+
+.form-control[readonly] {
+    background-color: #f8f9fa;
+    cursor: not-allowed;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 25px;
+    padding-top: 15px;
+    border-top: 1px solid #f0f0f0;
+}
+
+/* Button variants for modal */
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+}
+.btn-secondary:hover {
+    background-color: #5a6268;
 }

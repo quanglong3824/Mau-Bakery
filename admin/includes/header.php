@@ -41,6 +41,10 @@
                 class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'categories.php') ? 'active' : ''; ?>">
                 <i class="fas fa-tags"></i> Danh Mục
             </a>
+            <a href="tags.php"
+                class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'tags.php') ? 'active' : ''; ?>">
+                <i class="fas fa-lightbulb"></i> Gợi ý (Tags)
+            </a>
             <a href="users.php"
                 class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'users.php') ? 'active' : ''; ?>">
                 <i class="fas fa-users"></i> Khách Hàng

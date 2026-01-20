@@ -1,34 +1,18 @@
 <?php
 require_once 'controllers/CheckoutViewController.php';
 
-// Define Shipping Zones & Fees (Hardcoded for HCMC)
-$districts_data = [
-    'Q1' => ['name' => 'Quận 1', 'fee' => 15000],
-    'Q3' => ['name' => 'Quận 3', 'fee' => 15000],
-    'Q4' => ['name' => 'Quận 4', 'fee' => 15000],
-    'Q5' => ['name' => 'Quận 5', 'fee' => 15000],
-    'Q10' => ['name' => 'Quận 10', 'fee' => 15000],
-    'BINHTHANH' => ['name' => 'Quận Bình Thạnh', 'fee' => 15000],
-    'PHUNHUAN' => ['name' => 'Quận Phú Nhuận', 'fee' => 15000],
-
-    'Q6' => ['name' => 'Quận 6', 'fee' => 30000],
-    'Q7' => ['name' => 'Quận 7', 'fee' => 30000],
-    'Q8' => ['name' => 'Quận 8', 'fee' => 30000],
-    'Q11' => ['name' => 'Quận 11', 'fee' => 30000],
-    'TANBINH' => ['name' => 'Quận Tân Bình', 'fee' => 30000],
-    'GOVAP' => ['name' => 'Quận Gò Vấp', 'fee' => 30000],
-    'TANPHU' => ['name' => 'Quận Tân Phú', 'fee' => 30000],
-
-    'Q12' => ['name' => 'Quận 12', 'fee' => 50000],
-    'BINHTAN' => ['name' => 'Quận Bình Tân', 'fee' => 50000],
-    'THUDUC' => ['name' => 'TP. Thủ Đức', 'fee' => 50000],
-
-    'BINHCHANH' => ['name' => 'Huyện Bình Chánh', 'fee' => 60000],
-    'HOCMON' => ['name' => 'Huyện Hóc Môn', 'fee' => 60000],
-    'NHABE' => ['name' => 'Huyện Nhà Bè', 'fee' => 60000],
-    'CUCHI' => ['name' => 'Huyện Củ Chi', 'fee' => 70000],
-    'CANGIO' => ['name' => 'Huyện Cần Giờ', 'fee' => 100000],
-];
+// Fetch Shipping Zones from Database
+$districts_data = [];
+if (isset($conn)) {
+    try {
+        $stmt_zones = $conn->prepare("SELECT * FROM shipping_zones WHERE is_active = 1 ORDER BY fee ASC, name ASC");
+        $stmt_zones->execute();
+        $districts_data = $stmt_zones->fetchAll(PDO::FETCH_ASSOC);
+    } catch (PDOException $e) {
+        // Handle error gracefully or log it
+        $districts_data = [];
+    }
+}
 
 ?>
 
@@ -82,8 +66,8 @@ $districts_data = [
                         <label class="form-label">Quận / Huyện *</label>
                         <select class="form-input" name="district" id="district-select" required>
                             <option value="" data-fee="0">-- Chọn Quận/Huyện --</option>
-                            <?php foreach ($districts_data as $code => $data): ?>
-                                <option value="<?php echo $code; ?>" data-fee="<?php echo $data['fee']; ?>">
+                            <?php foreach ($districts_data as $data): ?>
+                                <option value="<?php echo $data['id']; ?>" data-fee="<?php echo $data['fee']; ?>">
                                     <?php echo $data['name']; ?> - Ship:
                                     <?php echo number_format($data['fee'], 0, ',', '.'); ?>đ
                                 </option>

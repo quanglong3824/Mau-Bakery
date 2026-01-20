@@ -10,9 +10,9 @@ require_once 'controllers/HomeController.php';
             <p class="hero-desc">Chào mừng đến với Mâu Bakery. Chúng tôi tạo ra những chiếc bánh kem thủ công
                 tuyệt hảo, đánh thức mọi giác quan của bạn.</p>
             <div class="hero-btns">
-                <a href="#menu" class="btn-glass"
+                <a href="index.php?page=menu" class="btn-glass"
                     style="background: var(--accent-color); color: white; border: none;">Đặt bánh ngay</a>
-                <a href="#menu" class="btn-glass" style="margin-left: 15px;">Xem Menu</a>
+                <a href="index.php?page=menu" class="btn-glass" style="margin-left: 15px;">Xem Menu</a>
             </div>
         </div>
         <div class="hero-image">
@@ -22,6 +22,64 @@ require_once 'controllers/HomeController.php';
             <img src="uploads/banh-kem-dau-tay.jpg" alt="Premium Berry Cake" class="hero-main-img">
         </div>
     </section>
+
+    <!-- Daily Suggestions Bar -->
+    <?php
+    $tags = [];
+    if (isset($conn)) {
+        try {
+            $stmt_tags = $conn->prepare("SELECT * FROM featured_tags WHERE is_active = 1 ORDER BY sort_order ASC");
+            $stmt_tags->execute();
+            $tags = $stmt_tags->fetchAll();
+        } catch (PDOException $e) {
+            // Ignore error
+        }
+    }
+    ?>
+    <?php if (!empty($tags)): ?>
+        <section class="container mt-2">
+            <div class="glass-panel"
+                style="padding: 15px 25px; display: flex; align-items: center; justify-content: center; background: rgba(255, 245, 238, 0.6); border: 1px solid rgba(255, 183, 197, 0.3);">
+                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: center;">
+                    <span style="color: #666; font-weight: 500; margin-right: 5px;">
+                        <i class="fas fa-lightbulb" style="color: var(--accent-color);"></i> Gợi ý hôm nay:
+                    </span>
+
+                    <?php foreach ($tags as $tag): ?>
+                        <a href="<?php echo $tag['url']; ?>" class="tag-pill">
+                            <?php if ($tag['icon']): ?>
+                                <i class="<?php echo $tag['icon']; ?>" style="margin-right: 5px;"></i>
+                            <?php endif; ?>
+                            <?php echo htmlspecialchars($tag['name']); ?>
+                        </a>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        </section>
+
+        <style>
+            .tag-pill {
+                display: inline-block;
+                padding: 8px 20px;
+                background: #fff;
+                border-radius: 50px;
+                text-decoration: none;
+                color: #555;
+                font-size: 0.95rem;
+                font-weight: 600;
+                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+                transition: all 0.3s ease;
+                border: 1px solid transparent;
+            }
+
+            .tag-pill:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                color: var(--accent-color);
+                border-color: var(--accent-color);
+            }
+        </style>
+    <?php endif; ?>
 
     <!-- Featured Products -->
     <section id="menu" class="container mt-2">
@@ -48,7 +106,7 @@ require_once 'controllers/HomeController.php';
         </div>
 
         <div class="text-center mb-2">
-            <a href="#" class="btn-glass" style="padding: 15px 40px;">Xem tất cả các loại bánh</a>
+            <a href="index.php?page=menu" class="btn-glass" style="padding: 15px 40px;">Xem tất cả các loại bánh</a>
         </div>
     </section>
 

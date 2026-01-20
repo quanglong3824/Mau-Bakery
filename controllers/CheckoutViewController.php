@@ -12,7 +12,7 @@ $subtotal = 0;
 foreach ($cart_items as $item) {
     $subtotal += $item['price'] * $item['quantity'];
 }
-$default_shipping = 30000;
+$default_shipping = 0;
 $total = $subtotal + $default_shipping;
 
 // User Data for Pre-filling

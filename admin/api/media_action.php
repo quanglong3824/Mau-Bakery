@@ -2,68 +2,12 @@
 session_start();
 require_once '../includes/auth_check.php'; // Ensure admin access
 
-$upload_dir = __DIR__ . '/../../uploads/';
-if (!file_exists($upload_dir)) {
-    if (!mkdir($upload_dir, 0777, true)) {
-        die(json_encode(['success' => false, 'message' => 'Cannot create upload directory: ' . $upload_dir]));
-    }
-}
-// Ensure it's writable
-if (!is_writable($upload_dir)) {
-    // Try to chmod if not writable
-    chmod($upload_dir, 0777);
-    if (!is_writable($upload_dir)) {
-        die(json_encode(['success' => false, 'message' => 'Upload directory is not writable. Please check permissions for: ' . $upload_dir]));
-    }
-}
+// Include Helper
+require_once '../includes/media_helper.php';
 
-// Response helper
-function jsonResponse($success, $message, $data = [])
-{
-    header('Content-Type: application/json');
-    echo json_encode(['success' => $success, 'message' => $message, 'data' => $data]);
-    exit;
-}
-
-// Slugify helper (Vietnamese Safe)
-function slugify($text)
-{
-    if (!$text)
-        return 'n-a';
-
-    // Map Vietnamese accents to ASCII
-    $vietnameseMap = [
-        'a' => 'á|à|ả|ã|ạ|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ',
-        'A' => 'Á|À|Ả|Ã|Ạ|Ă|Ắ|Ằ|Ẳ|Ẵ|Ặ|Â|Ấ|Ầ|Ẩ|Ẫ|Ậ',
-        'd' => 'đ',
-        'D' => 'Đ',
-        'e' => 'é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ',
-        'E' => 'É|È|Ẻ|Ẽ|Ẹ|Ê|Ế|Ề|Ể|Ễ|Ệ',
-        'i' => 'í|ì|ỉ|ĩ|ị',
-        'I' => 'Í|Ì|Ỉ|Ĩ|Ị',
-        'o' => 'ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ',
-        'O' => 'Ó|Ò|Ỏ|Õ|Ọ|Ô|Ố|Ồ|Ổ|Ỗ|Ộ|Ơ|Ớ|Ờ|Ở|Ỡ|Ợ',
-        'u' => 'ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự',
-        'U' => 'Ú|Ù|Ủ|Ũ|Ụ|Ư|Ứ|Ừ|Ử|Ữ|Ự',
-        'y' => 'ý|ỳ|ỷ|ỹ|ỵ',
-        'Y' => 'Ý|Ỳ|Ỷ|Ỹ|Ỵ'
-    ];
-
-    foreach ($vietnameseMap as $nonAccent => $accented) {
-        $text = preg_replace("/($accented)/u", $nonAccent, $text);
-    }
-
-    // Lowercase
-    $text = strtolower($text);
-
-    // Replace strict non-alphanumeric chars
-    $text = preg_replace('/[^a-z0-9\s-]/', '', $text);
-
-    // Replace spaces and multiple and dashes
-    $text = preg_replace('/[\s-]+/', '-', $text);
-    $text = trim($text, '-');
-
-    return empty($text) ? 'n-a' : $text;
+$upload_dir = getUploadDirectory();
+if (!$upload_dir) {
+    die(json_encode(['success' => false, 'message' => 'Upload directory is not writable.']));
 }
 
 $action = $_POST['action'] ?? $_GET['action'] ?? '';
