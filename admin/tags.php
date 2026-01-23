@@ -104,8 +104,8 @@ $products = $controller->getProducts();
                     <select id="add_linkType" class="form-control">
                         <option value="custom">Tự nhập Link thủ công</option>
                         <option value="category">Liên kết đến Danh mục Bánh</option>
-                        <option value="product">Sản phẩm cụ thể (Signature)</option>
-                        <option value="search">Liên kết đến Kết quả tìm kiếm</option>
+                        <option value="product_collection">Sản phẩm (Chọn 1 hoặc nhiều)</option>
+                        <option value="search">Liên kết đến Kết quả tìm kiếm (Từ khóa)</option>
                     </select>
                 </div>
                 <div id="add_specificSelect" class="form-group">
@@ -158,8 +158,8 @@ $products = $controller->getProducts();
                     <select id="edit_linkType" class="form-control">
                         <option value="">-- Giữ nguyên --</option>
                         <option value="custom">Tự nhập</option>
-                        <option value="category">Danh mục</option>
                         <option value="search">Tìm kiếm</option>
+                        <option value="product_collection">Sản phẩm (Chọn 1 hoặc nhiều)</option>
                     </select>
                     <div id="edit_specificSelect" style="margin-top: 10px;"></div>
                 </div>
@@ -179,6 +179,7 @@ $products = $controller->getProducts();
 <!-- Pass PHP Data to JS -->
 <script>
     const categoryData = <?php echo json_encode($categories); ?>;
+    const productData = <?php echo json_encode($products); ?>;
 </script>
 <script src="assets/js/tags.js"></script>
 

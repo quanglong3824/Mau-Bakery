@@ -11,6 +11,26 @@ if (isset($conn)) {
         $categories = [];
     }
 }
+// Fetch Active Tags
+$tags = [];
+if (isset($conn)) {
+    try {
+        $stmt_tags = $conn->prepare("SELECT * FROM featured_tags WHERE is_active = 1 ORDER BY sort_order ASC");
+        $stmt_tags->execute();
+        $tags = $stmt_tags->fetchAll();
+    } catch (PDOException $e) {
+        $tags = [];
+    }
+}
+
+// Fetch User Favorites (for heart status)
+$user_favorites = [];
+if (isset($_SESSION['user_id']) && isset($conn)) {
+    $stmt_fav = $conn->prepare("SELECT product_id FROM favorites WHERE user_id = ?");
+    $stmt_fav->execute([$_SESSION['user_id']]);
+    $user_favorites = $stmt_fav->fetchAll(PDO::FETCH_COLUMN);
+}
+
 
 // Fetch Products
 // 1. Capture Filters
@@ -19,8 +39,20 @@ $category_slug = isset($_GET['category']) ? $_GET['category'] : '';
 $price_filters = isset($_GET['price']) ? $_GET['price'] : []; // Array of price ranges
 $sort = isset($_GET['sort']) ? $_GET['sort'] : 'newest';
 $page = isset($_GET['p']) ? intval($_GET['p']) : 1;
-$limit = 9;
+$limit = 20;
 $offset = ($page - 1) * $limit;
+
+// Capture specific IDs filter (for collections)
+$ids_param = isset($_GET['ids']) ? $_GET['ids'] : '';
+$ids_filter = [];
+if (!empty($ids_param)) {
+    $temp_ids = explode(',', $ids_param);
+    foreach ($temp_ids as $tid) {
+        $tid = intval(trim($tid));
+        if ($tid > 0)
+            $ids_filter[] = $tid;
+    }
+}
 
 // 2. Resolve Category Slug to ID
 $category_id = null;
@@ -47,6 +79,11 @@ if ($keyword) {
 if ($category_id) {
     $where_clauses[] = "category_id = :cat_id";
     $params['cat_id'] = $category_id;
+}
+
+// IDs Filter
+if (!empty($ids_filter)) {
+    $where_clauses[] = "id IN (" . implode(',', $ids_filter) . ")";
 }
 
 // Price Ranges

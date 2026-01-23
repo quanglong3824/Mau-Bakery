@@ -1,28 +1,31 @@
 <?php
 // controllers/FavoritesController.php
 
-// Ensure user is logged in
 if (!isset($_SESSION['user_id'])) {
-    echo "<div class='container mt-2 text-center'><div class='glass-panel' style='padding:50px;'><h3>Vui lòng đăng nhập để xem danh sách yêu thích</h3><a href='auth/login.php' class='btn-glass mt-1'>Đăng nhập</a></div></div>";
-    return;
+    header("Location: index.php?page=login&redirect=favorites");
+    exit;
 }
 
 $user_id = $_SESSION['user_id'];
-$favorites = [];
+$products = [];
 
 if (isset($conn)) {
     try {
-        // Fetch Favorites Joined with Products
-        $sql = "SELECT p.*, f.created_at as liked_at 
-                FROM favorites f 
-                JOIN products p ON f.product_id = p.id 
-                WHERE f.user_id = :uid 
-                ORDER BY f.created_at DESC";
+        $sql = "
+            SELECT p.* 
+            FROM products p
+            JOIN favorites f ON p.id = f.product_id
+            WHERE f.user_id = :uid AND p.is_active = 1
+            ORDER BY f.created_at DESC
+        ";
         $stmt = $conn->prepare($sql);
         $stmt->execute(['uid' => $user_id]);
-        $favorites = $stmt->fetchAll();
+        $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        // Since we are on favorites page, all these are favorited by definition
+        $user_favorites = array_column($products, 'id');
+
     } catch (PDOException $e) {
-        $favorites = [];
+        $products = [];
     }
 }
-?>

@@ -1,5 +1,5 @@
 -- Database Backup: Mâu Bakery
--- Date: 2026-01-09 11:00:37
+-- Date: 2026-01-22 07:59:13
 -- Exported by: admin
 
 CREATE DATABASE IF NOT EXISTS `MauBakery` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
@@ -86,6 +86,20 @@ CREATE TABLE `favorites` (
 
 
 
+CREATE TABLE `featured_tags` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `url` varchar(255) NOT NULL,
+  `icon` varchar(50) DEFAULT NULL,
+  `sort_order` int(11) NOT NULL DEFAULT 0,
+  `is_active` tinyint(1) NOT NULL DEFAULT 1,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+
+
 CREATE TABLE `order_items` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `order_id` int(11) NOT NULL,
@@ -97,8 +111,9 @@ CREATE TABLE `order_items` (
   PRIMARY KEY (`id`),
   KEY `order_id` (`order_id`),
   CONSTRAINT `fk_items_orders` FOREIGN KEY (`order_id`) REFERENCES `orders` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `order_items` (`id`, `order_id`, `product_id`, `product_name`, `size`, `price`, `quantity`) VALUES ('1', '1', '1', 'Bánh Kem Chanh Vàng', '16cm (Nhỏ)', '350000.00', '2');
 
 
 CREATE TABLE `orders` (
@@ -121,8 +136,9 @@ CREATE TABLE `orders` (
   UNIQUE KEY `order_code` (`order_code`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_orders_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `orders` (`id`, `user_id`, `order_code`, `total_amount`, `shipping_fee`, `discount_amount`, `payment_method`, `status`, `payment_status`, `note`, `recipient_name`, `recipient_phone`, `shipping_address`, `is_active`, `created_at`) VALUES ('1', '7', 'ORD-20260120-2163', '715000.00', '15000.00', '0.00', 'cod', 'completed', 'unpaid', 'á', 'Quang Long', '0987654321', 'sdfgh, Quận 4, TP. Hồ Chí Minh', '1', '2026-01-20 18:09:29');
 
 
 CREATE TABLE `posts` (
@@ -231,6 +247,40 @@ CREATE TABLE `reviews` (
 
 
 
+CREATE TABLE `shipping_zones` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL COMMENT 'Tên Quận/Huyện',
+  `fee` decimal(10,0) NOT NULL DEFAULT 0 COMMENT 'Phí ship',
+  `is_active` tinyint(1) NOT NULL DEFAULT 1 COMMENT '1=Hiện, 0=Ẩn',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('1', 'Quận 1', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('2', 'Quận 3', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('3', 'Quận 4', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('4', 'Quận 5', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('5', 'Quận 10', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('6', 'Quận Bình Thạnh', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('7', 'Quận Phú Nhuận', '15000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('8', 'Quận 6', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('9', 'Quận 7', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('10', 'Quận 8', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('11', 'Quận 11', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('12', 'Quận Tân Bình', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('13', 'Quận Gò Vấp', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('14', 'Quận Tân Phú', '30000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('15', 'Quận 12', '50000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('16', 'Quận Bình Tân', '50000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('17', 'TP. Thủ Đức', '50000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('18', 'Huyện Bình Chánh', '60000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('19', 'Huyện Hóc Môn', '60000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('20', 'Huyện Nhà Bè', '60000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('21', 'Huyện Củ Chi', '70000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+INSERT INTO `shipping_zones` (`id`, `name`, `fee`, `is_active`, `created_at`, `updated_at`) VALUES ('22', 'Huyện Cần Giờ', '100000', '1', '2026-01-20 18:06:57', '2026-01-20 18:06:57');
+
+
 CREATE TABLE `user_addresses` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `user_id` int(11) NOT NULL,
@@ -242,12 +292,13 @@ CREATE TABLE `user_addresses` (
   PRIMARY KEY (`id`),
   KEY `user_id` (`user_id`),
   CONSTRAINT `fk_user_addresses_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `user_addresses` (`id`, `user_id`, `recipient_name`, `phone`, `address`, `is_default`, `is_active`) VALUES ('1', '2', 'Quang Long', '0909000222', '123 Nguyễn Huệ, Quận 1, TP.HCM', '1', '1');
 INSERT INTO `user_addresses` (`id`, `user_id`, `recipient_name`, `phone`, `address`, `is_default`, `is_active`) VALUES ('2', '2', 'Quang Long (Cty)', '0909000222', '456 Lê Duẩn, Quận 1, TP.HCM', '0', '1');
 INSERT INTO `user_addresses` (`id`, `user_id`, `recipient_name`, `phone`, `address`, `is_default`, `is_active`) VALUES ('3', '3', 'Thu Hà', '0909000333', '789 Võ Văn Tần, Quận 3, TP.HCM', '1', '1');
 INSERT INTO `user_addresses` (`id`, `user_id`, `recipient_name`, `phone`, `address`, `is_default`, `is_active`) VALUES ('4', '6', 'Long Meo Meo', '0987654321', '123 Biên Hoà Đồng Nai', '1', '1');
+INSERT INTO `user_addresses` (`id`, `user_id`, `recipient_name`, `phone`, `address`, `is_default`, `is_active`) VALUES ('5', '7', 'sdcs', '12345679000', 'sdcdsc', '1', '1');
 
 
 CREATE TABLE `users` (
@@ -265,8 +316,9 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `username` (`username`),
   UNIQUE KEY `email` (`email`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 INSERT INTO `users` (`id`, `username`, `password`, `email`, `full_name`, `phone`, `avatar`, `role`, `points`, `is_active`, `created_at`) VALUES ('1', 'admin', '$2y$10$7Uq7qtWO1yu3j6SUUkXUEOHeXRRBEiNDpWJJsESZ/8qQft79BS.Ba', 'admin@MauBakery.com', 'Admin System', '0909000111', NULL, 'admin', '0', '1', '2026-01-07 21:03:34');
+INSERT INTO `users` (`id`, `username`, `password`, `email`, `full_name`, `phone`, `avatar`, `role`, `points`, `is_active`, `created_at`) VALUES ('7', 'longmeomeo', '$2y$10$hPIJ1XzQBxTz7DAGBJZuXeZfm6zoHNPqlns7TlUMFjn8mD5ItP9Ei', 'long.lequang308@gmail.com', 'Quang Long', '0987654321', NULL, 'user', '0', '1', '2026-01-20 18:08:18');
 
 SET FOREIGN_KEY_CHECKS=1;

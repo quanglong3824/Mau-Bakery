@@ -70,8 +70,42 @@ document.addEventListener('DOMContentLoaded', function() {
             else if (type === 'search') {
                 specificSelect.innerHTML = `<input type="text" class="form-control" placeholder="Nhập từ khóa (e.g. healthy)" onchange="generateUrl('${prefix}', 'search', this.value)">`;
             }
+            else if (type === 'product_collection') {
+                let options = '';
+                if (typeof productData !== 'undefined') {
+                    productData.forEach(p => {
+                        options += `
+                            <label style="display:block; margin-bottom:5px;">
+                                <input type="checkbox" name="product_ids[]" value="${p.id}" onchange="updateCollectionUrl('${prefix}')"> 
+                                ${p.name}
+                            </label>`;
+                    });
+                }
+                const selectHTML = `<div style="max-height: 150px; overflow-y: auto; border: 1px solid #ddd; padding: 10px; border-radius: 5px;">${options}</div>`;
+                specificSelect.innerHTML = selectHTML;
+            }
         });
     }
+
+    // Helper to join IDs
+    window.updateCollectionUrl = function(prefix) {
+        // Collect checked boxes inside the specificSelect container
+        const container = document.getElementById(prefix + 'specificSelect');
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]:checked');
+        const ids = Array.from(checkboxes).map(cb => cb.value);
+        
+        let finalUrl = '';
+        if (ids.length === 1) {
+             // Single product -> Go to detail page
+             finalUrl = `index.php?page=product_detail&id=${ids[0]}`;
+        } else if (ids.length > 1) {
+             // Multiple products -> Go to menu page filtered by these IDs
+             finalUrl = `index.php?page=menu&ids=${ids.join(',')}`;
+        }
+        
+        document.getElementById(prefix + 'url').value = finalUrl;
+    }
+
 
     window.generateUrl = function(prefix, type, value) {
         let finalUrl = '';

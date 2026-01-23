@@ -45,6 +45,10 @@
                 class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'tags.php') ? 'active' : ''; ?>">
                 <i class="fas fa-lightbulb"></i> Gợi ý (Tags)
             </a>
+            <a href="shipping_zones.php"
+                class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'shipping_zones.php') ? 'active' : ''; ?>">
+                <i class="fas fa-truck"></i> Khu vực Ship
+            </a>
             <a href="users.php"
                 class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'users.php') ? 'active' : ''; ?>">
                 <i class="fas fa-users"></i> Khách Hàng

@@ -13,14 +13,15 @@ require_once 'controllers/MenuController.php';
             <span style="font-size: 0.9rem; color: #666; display: flex; align-items: center;"><i
                     class="fas fa-lightbulb" style="color: var(--accent-color); margin-right: 5px;"></i> Gợi ý hôm
                 nay:</span>
-            <a href="#" class="btn-glass" style="padding: 5px 15px; font-size: 0.85rem; border-radius: 15px;">Ít
-                ngọt</a>
-            <a href="#" class="btn-glass"
-                style="padding: 5px 15px; font-size: 0.85rem; border-radius: 15px;">Healthy</a>
-            <a href="#" class="btn-glass" style="padding: 5px 15px; font-size: 0.85rem; border-radius: 15px;">Best
-                Seller</a>
-            <a href="#" class="btn-glass" style="padding: 5px 15px; font-size: 0.85rem; border-radius: 15px;">Mùa dâu
-                tây</a>
+            <?php foreach ($tags as $tag): ?>
+                <a href="<?php echo htmlspecialchars($tag['url']); ?>" class="btn-glass"
+                    style="padding: 5px 15px; font-size: 0.85rem; border-radius: 15px; display: flex; align-items: center; gap: 5px; text-decoration: none; color: inherit;">
+                    <?php if ($tag['icon']): ?>
+                        <i class="<?php echo htmlspecialchars($tag['icon']); ?>"></i>
+                    <?php endif; ?>
+                    <?php echo htmlspecialchars($tag['name']); ?>
+                </a>
+            <?php endforeach; ?>
         </div>
     </div>
 
@@ -38,11 +39,14 @@ require_once 'controllers/MenuController.php';
                 <div style="margin-bottom: 30px;">
                     <h3 style="margin-bottom: 15px; font-size: 1.2rem;">Tìm kiếm</h3>
                     <div style="position: relative;">
-                        <input type="text" name="keyword" placeholder="Tìm tên bánh..."
-                            value="<?php echo htmlspecialchars($keyword); ?>"
+                        <input type="text" name="keyword" id="searchInput" autocomplete="off"
+                            placeholder="Tìm tên bánh..." value="<?php echo htmlspecialchars($keyword); ?>"
                             style="width: 100%; padding: 10px 10px 10px 40px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.6); background: rgba(255,255,255,0.5); outline: none;">
                         <i class="fas fa-search"
                             style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #888; font-size: 0.9rem;"></i>
+
+                        <!-- Autocomplete Results -->
+                        <div id="searchResults" class="search-dropdown"></div>
                     </div>
                 </div>
 
@@ -128,8 +132,16 @@ require_once 'controllers/MenuController.php';
                         <div class="glass-panel product-card"
                             onclick="window.location.href='index.php?page=product_detail&id=<?php echo $product['id']; ?>'"
                             style="cursor: pointer;">
-                            <img src="<?php echo htmlspecialchars($product['image']); ?>" class="product-img" loading="lazy"
-                                alt="<?php echo htmlspecialchars($product['name']); ?>">
+                            <div style="position: relative;">
+                                <img src="<?php echo htmlspecialchars($product['image']); ?>" class="product-img" loading="lazy"
+                                    alt="<?php echo htmlspecialchars($product['name']); ?>">
+                                <!-- Heart Icon -->
+                                <div class="favorite-btn" onclick="toggleFavorite(event, <?php echo $product['id']; ?>)"
+                                    style="position: absolute; top: 10px; right: 10px; width: 35px; height: 35px; background: rgba(255,255,255,0.9); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: transform 0.2s;">
+                                    <i class="<?php echo in_array($product['id'], $user_favorites) ? 'fas' : 'far'; ?> fa-heart"
+                                        style="color: <?php echo in_array($product['id'], $user_favorites) ? '#e74c3c' : '#888'; ?>; font-size: 1.1rem;"></i>
+                                </div>
+                            </div>
                             <h3 class="product-name" style="font-size: 1.1rem;">
                                 <?php echo $product['name']; ?>
                             </h3>
@@ -172,4 +184,7 @@ require_once 'controllers/MenuController.php';
     </div>
 </div>
 
+<link rel="stylesheet" href="assets/css/search.css">
 <script src="assets/js/menu.js"></script>
+<script src="assets/js/search.js"></script>
+<script src="assets/js/favorites.js"></script>

@@ -110,6 +110,7 @@
                 </ul>
 
                 <div class="nav-icons">
+                    <a href="index.php?page=favorites" title="Yêu thích"><i class="far fa-heart"></i></a>
                     <a href="index.php?page=search"><i class="fas fa-search"></i></a>
                     <div class="user-actions">
                         <?php if (isset($_SESSION['user_id'])): ?>
