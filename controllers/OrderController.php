@@ -19,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $city = isset($_POST['city']) ? trim($_POST['city']) : 'TP. Hồ Chí Minh';
     $district_id = isset($_POST['district']) ? $_POST['district'] : 0;
     $address_specific = isset($_POST['address_specific']) ? trim($_POST['address_specific']) : '';
-    
+
     // Validate District and Get Fee from Database
     $shipping_fee = 0;
     $district_name = '';
@@ -34,7 +34,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             $district_name = $zone['name'];
         } else {
             // Fallback for invalid district ID (hack attempt?)
-            $shipping_fee = 30000; 
+            $shipping_fee = 30000;
             $district_name = "Khu vực không xác định ($district_id)";
         }
     } catch (PDOException $e) {
@@ -51,7 +51,39 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         $subtotal += $item['price'] * $item['quantity'];
     }
 
-    $total_amount = $subtotal + $shipping_fee;
+    // Process Voucher
+    $coupon_code = isset($_POST['coupon_code']) ? trim($_POST['coupon_code']) : '';
+    $discount_amount = 0;
+
+    if (!empty($coupon_code)) {
+        try {
+            $stmt_c = $conn->prepare("SELECT * FROM coupons WHERE code = :code AND is_active = 1");
+            $stmt_c->execute(['code' => $coupon_code]);
+            $coupon = $stmt_c->fetch(PDO::FETCH_ASSOC);
+
+            if ($coupon && strtotime($coupon['expiry_date']) >= time() && $coupon['quantity'] > 0) {
+                if ($subtotal >= $coupon['min_order']) {
+                    if ($coupon['discount_type'] == 'percent') {
+                        $discount_amount = $subtotal * ($coupon['discount_value'] / 100);
+                    } else {
+                        $discount_amount = $coupon['discount_value'];
+                    }
+                    if ($discount_amount > $subtotal)
+                        $discount_amount = $subtotal;
+
+                    // Deduct quantity
+                    $stmt_up_cp = $conn->prepare("UPDATE coupons SET quantity = quantity - 1 WHERE id = :id");
+                    $stmt_up_cp->execute(['id' => $coupon['id']]);
+                }
+            }
+        } catch (PDOException $e) {
+            // Ignore if coupon fails to validate
+        }
+    }
+
+    $total_amount = $subtotal + $shipping_fee - $discount_amount;
+    if ($total_amount < 0)
+        $total_amount = 0;
 
     // Generate Order Code
     $order_code = 'ORD-' . date('Ymd') . '-' . rand(1000, 9999);
@@ -61,8 +93,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
         $conn->beginTransaction();
 
         // 1. Insert into orders
-        $sql = "INSERT INTO orders (user_id, order_code, total_amount, shipping_fee, payment_method, status, recipient_name, recipient_phone, shipping_address, note) 
-                VALUES (:user_id, :order_code, :total_amount, :shipping_fee, :payment_method, 'pending', :recipient_name, :recipient_phone, :shipping_address, :note)";
+        $sql = "INSERT INTO orders (user_id, order_code, total_amount, shipping_fee, discount_amount, payment_method, status, recipient_name, recipient_phone, shipping_address, note) 
+                VALUES (:user_id, :order_code, :total_amount, :shipping_fee, :discount_amount, :payment_method, 'pending', :recipient_name, :recipient_phone, :shipping_address, :note)";
 
         $stmt = $conn->prepare($sql);
         $stmt->execute([
@@ -70,6 +102,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
             'order_code' => $order_code,
             'total_amount' => $total_amount,
             'shipping_fee' => $shipping_fee,
+            'discount_amount' => $discount_amount,
             'payment_method' => $payment_method,
             'recipient_name' => $recipient_name,
             'recipient_phone' => $recipient_phone,

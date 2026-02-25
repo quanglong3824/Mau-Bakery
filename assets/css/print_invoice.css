@@ -1,0 +1,186 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap");
+
+body {
+  font-family: "Montserrat", sans-serif;
+  color: #333;
+  margin: 0;
+  padding: 0;
+  background: #fdfdfd;
+}
+
+.invoice-container {
+  max-width: 800px;
+  margin: 40px auto;
+  background: #fff;
+  padding: 50px;
+  border: 1px solid #eaeaea;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+  border-radius: 8px;
+}
+
+.invoice-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  border-bottom: 2px solid #b19cd9;
+  /* Bakery primary accent */
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+
+.company-info h1 {
+  margin: 0 0 10px 0;
+  color: #b19cd9;
+  font-size: 28px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.company-info p {
+  margin: 2px 0;
+  color: #666;
+  font-size: 14px;
+}
+
+.invoice-title {
+  text-align: right;
+}
+
+.invoice-title h2 {
+  margin: 0 0 5px 0;
+  font-size: 24px;
+  color: #444;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.invoice-title p {
+  margin: 0;
+  color: #888;
+  font-size: 14px;
+}
+
+.billing-info {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 40px;
+}
+
+.billing-info div {
+  width: 48%;
+}
+
+.billing-info h3 {
+  font-size: 16px;
+  color: #444;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed #ccc;
+  padding-bottom: 5px;
+  text-transform: uppercase;
+}
+
+.billing-info p {
+  margin: 5px 0;
+  line-height: 1.5;
+  font-size: 14px;
+  color: #555;
+}
+
+table.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 40px;
+}
+
+table.items-table th {
+  background: #f8f8f8;
+  padding: 12px 15px;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 2px solid #ddd;
+  border-top: 1px solid #ddd;
+  color: #444;
+}
+
+table.items-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  font-size: 14px;
+  color: #555;
+  vertical-align: middle;
+}
+
+.totals {
+  width: 350px;
+  float: right;
+}
+
+.total-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+  color: #555;
+}
+
+.total-row.final {
+  margin-top: 10px;
+  padding-top: 15px;
+  border-top: 2px solid #ddd;
+  font-size: 18px;
+  font-weight: 700;
+  color: #b19cd9;
+}
+
+.clearfix {
+  clear: both;
+}
+
+.footer {
+  margin-top: 60px;
+  text-align: center;
+  color: #888;
+  font-size: 13px;
+  border-top: 1px solid #eaeaea;
+  padding-top: 20px;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: #fff;
+  }
+
+  .invoice-container {
+    box-shadow: none;
+    border: none;
+    margin: 0;
+    padding: 20px;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+}
+
+.btn-print {
+  display: inline-block;
+  background: #b19cd9;
+  color: white;
+  padding: 12px 25px;
+  text-decoration: none;
+  border-radius: 5px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  cursor: pointer;
+  border: none;
+  font-size: 14px;
+  transition: 0.3s;
+}
+
+.btn-print:hover {
+  background: #9b85c1;
+}

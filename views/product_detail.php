@@ -62,10 +62,29 @@ if (!$product) {
                 </h1>
 
                 <div class="rating">
-                    <?php for ($i = 0; $i < 5; $i++)
-                        echo '<i class="fas fa-star"></i>'; ?>
-                    <span style="color: #666; font-size: 0.9rem; margin-left: 10px;">(
-                        <?php echo $product['views']; ?> lượt xem)
+                    <?php
+                    $full_stars = isset($avg_rating) ? floor($avg_rating) : 0;
+                    $half_star = isset($avg_rating) && ($avg_rating - $full_stars) >= 0.5 ? 1 : 0;
+                    $empty_stars = 5 - ($full_stars + $half_star);
+
+                    if (isset($review_count) && $review_count == 0) {
+                        for ($i = 0; $i < 5; $i++)
+                            echo '<i class="far fa-star"></i>';
+                    } else {
+                        for ($i = 0; $i < $full_stars; $i++)
+                            echo '<i class="fas fa-star" style="color: #FFD700;"></i>';
+                        if ($half_star)
+                            echo '<i class="fas fa-star-half-alt" style="color: #FFD700;"></i>';
+                        for ($i = 0; $i < $empty_stars; $i++)
+                            echo '<i class="far fa-star" style="color: #FFD700;"></i>';
+                    }
+                    ?>
+                    <span style="color: #666; font-size: 0.9rem; margin-left: 10px;">
+                        (<?php echo isset($review_count) ? $review_count : 0; ?> đánh giá)
+                    </span>
+                    <span style="color: #ccc; margin: 0 5px;">|</span>
+                    <span style="color: #666; font-size: 0.9rem;">
+                        <?php echo $product['views']; ?> lượt xem
                     </span>
                 </div>
 
@@ -208,10 +227,11 @@ if (!$product) {
                     <?php echo number_format($prod['base_price'], 0, ',', '.'); ?>đ
                 </p>
                 <div class="product-actions">
-                    <a href="index.php?page=product_detail&id=<?php echo $prod['id']; ?>" class="btn-glass"
-                        style="padding: 10px 20px; font-size: 0.9rem;">
+                    <button
+                        onclick="addToCart(<?php echo $prod['id']; ?>, '<?php echo addslashes($prod['name']); ?>', <?php echo $prod['base_price']; ?>); event.stopPropagation();"
+                        class="btn-glass" style="padding: 10px 20px; font-size: 0.9rem; border: none; cursor: pointer;">
                         <i class="fas fa-shopping-cart"></i> Mua ngay
-                    </a>
+                    </button>
                 </div>
             </div>
         <?php endforeach; ?>

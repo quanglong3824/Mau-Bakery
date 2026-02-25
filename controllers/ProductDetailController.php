@@ -49,6 +49,15 @@ if (isset($conn) && $id > 0) {
         $stmt_reviews->execute(['pid' => $id]);
         $reviews = $stmt_reviews->fetchAll();
         $review_count = count($reviews);
+
+        $avg_rating = 0;
+        if ($review_count > 0) {
+            $sum = 0;
+            foreach ($reviews as $rev) {
+                $sum += $rev['rating'];
+            }
+            $avg_rating = round($sum / $review_count, 1);
+        }
     }
 }
 ?>

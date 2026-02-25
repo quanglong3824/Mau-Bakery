@@ -1,3 +1,6 @@
 function checkOrder() {
-    alert('Vui lòng kiểm tra email hoặc liên hệ hotline để tra cứu.');
+    const orderCode = prompt("Vui lòng nhập mã đơn hàng của bạn (Ví dụ: ORD-...):");
+    if (orderCode && orderCode.trim() !== "") {
+        window.location.href = "index.php?page=order_detail&code=" + encodeURIComponent(orderCode.trim());
+    }
 }

@@ -1,0 +1,20 @@
+.tag-pill {
+    display: inline-block;
+    padding: 8px 20px;
+    background: #fff;
+    border-radius: 50px;
+    text-decoration: none;
+    color: #555;
+    font-size: 0.95rem;
+    font-weight: 600;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid transparent;
+}
+
+.tag-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    color: var(--accent-color);
+    border-color: var(--accent-color);
+}

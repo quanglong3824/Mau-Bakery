@@ -131,8 +131,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     cartBadges.forEach(badge => {
                         badge.innerText = data.cart_count;
                         // Add a small bounce animation
-                        badge.style.transform = 'scale(1.2)';
-                        setTimeout(() => badge.style.transform = 'scale(1)', 200);
+                        badge.style.transform = 'scale(1.4)';
+                        badge.style.transition = 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+                        setTimeout(() => badge.style.transform = 'scale(1)', 300);
                     });
 
                     setTimeout(() => {

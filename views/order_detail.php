@@ -1,11 +1,19 @@
 <?php
 require_once 'controllers/OrderDetailController.php';
-?>
-if (!$order) {
-    echo "<div class='container mt-2'><h3>Đơn hàng không tồn tại hoặc bạn không có quyền truy cập!</h3><a href='index.php?page=profile'>Về tài khoản</a></div>";
-    return;
+
+if (isset($msg_review)) {
+    echo "<script>alert('" . addslashes($msg_review) . "');</script>";
+}
+if (isset($err_review)) {
+    echo "<script>alert('" . addslashes($err_review) . "');</script>";
 }
 
+if (!$order) {
+    echo "<div class='container mt-2'>
+    <h3>Đơn hàng không tồn tại hoặc bạn không có quyền truy cập!</h3><a href='index.php'>Về trang chủ</a>
+</div>";
+    return;
+}
 ?>
 <link rel="stylesheet" href="assets/css/order_detail.css">
 
@@ -247,12 +255,20 @@ if (!$order) {
                 <?php endif; ?>
 
                 <?php if ($order['status'] == 'completed'): ?>
-                    <button class="btn-glass btn-primary" style="padding: 10px 20px;">Đánh giá</button>
+                    <button class="btn-glass btn-primary" onclick="openFirstUnreviewedModal()"
+                        style="padding: 10px 20px;">Đánh giá</button>
                     <!-- Buy again could just link to product detail of first item or similar -->
                 <?php endif; ?>
 
-                <a href="index.php?page=profile" class="btn-glass" style="padding: 10px 20px;">
+                <a href="<?php echo isset($_SESSION['user_id']) ? 'index.php?page=profile' : 'index.php'; ?>"
+                    class="btn-glass" style="padding: 10px 20px;">
                     <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+
+                <a href="index.php?page=print_invoice&code=<?php echo htmlspecialchars($order['code']); ?>"
+                    target="_blank" class="btn-glass"
+                    style="padding: 10px 20px; background: #fff; border: 1px solid #ccc;">
+                    <i class="fas fa-print"></i> In Hóa Đơn
                 </a>
             </div>
 

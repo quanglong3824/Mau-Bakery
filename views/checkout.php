@@ -26,6 +26,8 @@ if (isset($conn)) {
 
     <form action="index.php?page=process_checkout" method="POST" class="checkout-layout" id="checkout-form">
         <input type="hidden" name="action" value="place_order">
+        <input type="hidden" name="coupon_code" id="hidden_coupon_code" value="">
+        <input type="hidden" name="discount_amount" id="hidden_discount_amount" value="0">
 
         <!-- Left Column: Information Steps -->
         <div class="checkout-steps">
@@ -178,6 +180,12 @@ if (isset($conn)) {
                 <div class="summary-row">
                     <span>Phí vận chuyển</span>
                     <span id="checkout-shipping">0đ</span>
+                </div>
+
+                <!-- Discount Row -->
+                <div class="summary-row" id="checkout-discount-row" style="display: none; color: #22c55e;">
+                    <span>Giảm giá</span>
+                    <span id="checkout-discount">-0đ</span>
                 </div>
 
 

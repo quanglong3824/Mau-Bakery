@@ -29,6 +29,13 @@
         </div>
     </div>
 </footer>
+<!-- Back to Top Button -->
+<button id="backToTopBtn" title="Lên đầu trang">
+    <i class="fas fa-arrow-up"></i>
+</button>
+
+<link rel="stylesheet" href="assets/css/footer.css">
+<script src="assets/js/footer.js"></script>
 </body>
 
 </html>

@@ -19,7 +19,7 @@ require_once 'controllers/HomeController.php';
             <div class="glass-bg"
                 style="position: absolute; width: 400px; height: 400px; background: rgba(255,255,255,0.2); border-radius: 50%; filter: blur(40px); z-index: -1;">
             </div>
-            <img src="uploads/banh-kem-dau-tay.jpg" alt="Premium Berry Cake" class="hero-main-img">
+            <img src="uploads/banh-kem-chanh-vang.jpg" alt="Bánh Kem Chanh Vàng Signature" class="hero-main-img">
         </div>
     </section>
 
@@ -57,28 +57,7 @@ require_once 'controllers/HomeController.php';
             </div>
         </section>
 
-        <style>
-            .tag-pill {
-                display: inline-block;
-                padding: 8px 20px;
-                background: #fff;
-                border-radius: 50px;
-                text-decoration: none;
-                color: #555;
-                font-size: 0.95rem;
-                font-weight: 600;
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-                transition: all 0.3s ease;
-                border: 1px solid transparent;
-            }
-
-            .tag-pill:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-                color: var(--accent-color);
-                border-color: var(--accent-color);
-            }
-        </style>
+        <link rel="stylesheet" href="assets/css/home.css">
     <?php endif; ?>
 
     <!-- Featured Products -->
@@ -96,10 +75,11 @@ require_once 'controllers/HomeController.php';
                     </h3>
                     <?php echo number_format($product['base_price'], 0, ',', '.'); ?>đ
                     <div class="product-actions">
-                        <a href="index.php?page=product_detail&id=<?php echo $product['id']; ?>" class="btn-glass"
-                            style="padding: 10px 20px; font-size: 0.9rem;">
+                        <button
+                            onclick="addToCart(<?php echo $product['id']; ?>, '<?php echo addslashes($product['name']); ?>', <?php echo $product['base_price']; ?>); event.stopPropagation();"
+                            class="btn-glass" style="padding: 10px 20px; font-size: 0.9rem; border: none; cursor: pointer;">
                             <i class="fas fa-shopping-cart"></i> Mua ngay
-                        </a>
+                        </button>
                     </div>
                 </div>
             <?php endforeach; ?>

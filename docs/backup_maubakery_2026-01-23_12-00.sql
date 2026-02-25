@@ -1,5 +1,5 @@
 -- Database Backup: Mâu Bakery
--- Date: 2026-01-22 07:59:13
+-- Date: 2026-01-23 12:00:32
 -- Exported by: admin
 
 CREATE DATABASE IF NOT EXISTS `MauBakery` CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci;
@@ -82,8 +82,9 @@ CREATE TABLE `favorites` (
   KEY `product_id` (`product_id`),
   CONSTRAINT `fk_favorites_products` FOREIGN KEY (`product_id`) REFERENCES `products` (`id`) ON DELETE CASCADE,
   CONSTRAINT `fk_favorites_users` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `favorites` (`id`, `user_id`, `product_id`, `created_at`) VALUES ('1', '7', '1', '2026-01-22 14:55:24');
 
 
 CREATE TABLE `featured_tags` (
@@ -96,8 +97,10 @@ CREATE TABLE `featured_tags` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+INSERT INTO `featured_tags` (`id`, `name`, `url`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES ('1', 'Mùa Dâu', 'index.php?page=product_detail&id=2', '', '0', '1', '2026-01-22 14:09:12', '2026-01-22 14:10:56');
+INSERT INTO `featured_tags` (`id`, `name`, `url`, `icon`, `sort_order`, `is_active`, `created_at`, `updated_at`) VALUES ('2', 'Mùa trái cây', 'index.php?page=menu&ids=1,2,9', '', '1', '1', '2026-01-22 14:13:08', '2026-01-22 14:13:08');
 
 
 CREATE TABLE `order_items` (

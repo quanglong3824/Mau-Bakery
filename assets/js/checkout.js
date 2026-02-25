@@ -27,12 +27,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 2. Coupon Mock
+    // 2. Coupon DB check
     const btnApply = document.querySelector('.btn-apply');
-    if(btnApply) {
+    const couponInput = document.querySelector('.coupon-group input');
+    
+    let currentDiscount = 0;
+    
+    if(btnApply && couponInput) {
         btnApply.addEventListener('click', function(e) {
             e.preventDefault();
-            alert("Mã giảm giá không hợp lệ hoặc đã hết hạn!");
+            const code = couponInput.value.trim();
+            const subtotal = parseInt(subtotalEl.getAttribute('data-amount')) || 0;
+            
+            if (!code) {
+                // If input is empty, clear the discount
+                currentDiscount = 0;
+                if (document.getElementById('checkout-discount-row')) document.getElementById('checkout-discount-row').style.display = 'none';
+                if (document.getElementById('hidden_coupon_code')) document.getElementById('hidden_coupon_code').value = '';
+                if (document.getElementById('hidden_discount_amount')) document.getElementById('hidden_discount_amount').value = 0;
+                recalculateTotal();
+                return;
+            }
+            
+            fetch('api/apply_voucher.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ code: code, subtotal: subtotal })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert(data.message);
+                    currentDiscount = data.discount_amount;
+                    
+                    // Update UI 
+                    let discountRow = document.getElementById('checkout-discount-row');
+                    if(currentDiscount > 0) {
+                        if(discountRow) {
+                            discountRow.style.display = 'flex';
+                            document.getElementById('checkout-discount').innerText = '-' + new Intl.NumberFormat('vi-VN').format(currentDiscount) + 'đ';
+                        }
+                    }
+                    
+                    // Set hidden inputs
+                    if (document.getElementById('hidden_coupon_code')) document.getElementById('hidden_coupon_code').value = data.coupon_code;
+                    if (document.getElementById('hidden_discount_amount')) document.getElementById('hidden_discount_amount').value = currentDiscount;
+                    
+                    recalculateTotal();
+                } else {
+                    alert(data.message);
+                    currentDiscount = 0;
+                    if (document.getElementById('checkout-discount-row')) document.getElementById('checkout-discount-row').style.display = 'none';
+                    if (document.getElementById('hidden_coupon_code')) document.getElementById('hidden_coupon_code').value = '';
+                    if (document.getElementById('hidden_discount_amount')) document.getElementById('hidden_discount_amount').value = 0;
+                    recalculateTotal();
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Đã xảy ra lỗi kết nối.");
+            });
         });
     }
 
@@ -45,14 +101,16 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function recalculateTotal() {
         // Get fee from selected option
-        const selectedOption = districtSelect.options[districtSelect.selectedIndex];
-        const shippingFee = parseInt(selectedOption.getAttribute('data-fee')) || 0;
+        const selectedOption = districtSelect.options[districtSelect.selectedIndex]? districtSelect.options[districtSelect.selectedIndex] : null;
+        let shippingFee = 0;
+        if(selectedOption) shippingFee = parseInt(selectedOption.getAttribute('data-fee')) || 0;
         
         // Get Subtotal
-        const subtotal = parseInt(subtotalEl.getAttribute('data-amount'));
+        const subtotal = parseInt(subtotalEl.getAttribute('data-amount')) || 0;
         
         // Calculate Total
-        const total = subtotal + shippingFee;
+        let total = subtotal + shippingFee - currentDiscount;
+        if (total < 0) total = 0;
         
         // Update DOM
         shippingEl.innerText = new Intl.NumberFormat('vi-VN').format(shippingFee) + 'đ';
@@ -68,6 +126,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Listen for District Change
     if(districtSelect) {
         districtSelect.addEventListener('change', recalculateTotal);
+    }
+    
+    // Auto-cancel discount if user clears the input
+    if (couponInput) {
+        couponInput.addEventListener('input', function() {
+            if (this.value.trim() === '') {
+                currentDiscount = 0;
+                if (document.getElementById('checkout-discount-row')) document.getElementById('checkout-discount-row').style.display = 'none';
+                if (document.getElementById('hidden_coupon_code')) document.getElementById('hidden_coupon_code').value = '';
+                if (document.getElementById('hidden_discount_amount')) document.getElementById('hidden_discount_amount').value = 0;
+                recalculateTotal();
+            }
+        });
     }
     
     // Initial Calc (To ensure numbers are formatted)

@@ -8,7 +8,7 @@ require_once 'config/db.php';
 $page = isset($_GET['page']) ? $_GET['page'] : 'home';
 
 // Lists of pages that do not need Header/Footer (Actions/Controllers)
-$no_layout_pages = ['cart_action', 'process_checkout'];
+$no_layout_pages = ['cart_action', 'process_checkout', 'print_invoice'];
 
 // Include Header only if not an action page
 if (!in_array($page, $no_layout_pages)) {
@@ -64,12 +64,10 @@ switch ($page) {
     case 'vouchers':
         include 'views/vouchers.php';
         break;
-    case 'search':
-        include 'views/search.php';
+    case 'print_invoice':
+        include 'views/print_invoice.php';
         break;
-    case 'favorites':
-        include 'views/favorites.php';
-        break;
+
 
     // --- Controller Actions ---
     case 'cart_action':

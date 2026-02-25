@@ -32,8 +32,9 @@
                 <span><i class="fas fa-envelope"></i> hello@maubakery.com</span>
             </div>
             <div class="top-bar-right">
+                <a href="#" onclick="checkOrderGlobal(event)"><i class="fas fa-search-location"></i> Theo dõi đơn
+                    hàng</a>
                 <a href="#">Trợ giúp</a>
-                <a href="#">Tin tức</a>
                 <span style="display: flex; gap: 10px;">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
                     <a href="#"><i class="fab fa-instagram"></i></a>
@@ -252,50 +253,4 @@
     </header>
 
     <!-- Script to handle sticky header and mobile menu -->
-    <!-- Script to handle sticky header and mobile menu -->
-    <script>
-        window.addEventListener('scroll', function () {
-            const header = document.querySelector('header');
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
-            }
-        });
-
-        // Mobile Menu Logic
-        const mobileBtn = document.querySelector('.mobile-menu-btn');
-        const mobileMenu = document.querySelector('.mobile-menu-overlay');
-
-        function toggleMenu() {
-            const isActive = mobileMenu.classList.toggle('active');
-            mobileBtn.classList.toggle('active');
-
-            // Optional: Toggle body scroll
-            if (isActive) {
-                document.body.style.overflow = 'hidden';
-            } else {
-                document.body.style.overflow = '';
-            }
-        }
-
-        // Toggle button click
-        mobileBtn.addEventListener('click', function (e) {
-            e.stopPropagation(); // Prevent document click from firing immediately
-            toggleMenu();
-        });
-
-        // Close when clicking overlay (backdrop)
-        mobileMenu.addEventListener('click', function (event) {
-            if (event.target === mobileMenu) {
-                toggleMenu();
-            }
-        });
-
-        // Also close when pressing Escape key
-        document.addEventListener('keydown', function (event) {
-            if (event.key === 'Escape' && mobileMenu.classList.contains('active')) {
-                toggleMenu();
-            }
-        });
-    </script>
+    <script src="assets/js/header.js"></script>
