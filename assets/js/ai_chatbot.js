@@ -8,8 +8,20 @@ document.addEventListener('DOMContentLoaded', function() {
     const messagesContainer = document.getElementById('unified-chat-messages');
     const typingIndicator = document.getElementById('ai-typing');
     const aiModeToggle = document.getElementById('ai-mode-toggle');
+    const modeLabel = document.getElementById('chat-mode-label');
 
     if (!toggle) return;
+
+    // Listen for toggle changes
+    aiModeToggle.addEventListener('change', function() {
+        if (this.checked) {
+            modeLabel.innerText = "AI Trợ Lý";
+            modeLabel.style.color = "#fff";
+        } else {
+            modeLabel.innerText = "Nhân Viên";
+            modeLabel.style.color = "#ff7e5f";
+        }
+    });
 
     let roomId = localStorage.getItem('chat_room_id');
     let pollInterval = null;

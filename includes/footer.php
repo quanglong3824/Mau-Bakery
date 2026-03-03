@@ -48,14 +48,14 @@
                 <h3 style="margin:0; font-size:16px;"><i class="fas fa-birthday-cake"></i> Mâu Bakery Chat</h3>
             </div>
             <div style="display: flex; align-items: center; gap: 10px;">
-                <div class="ai-toggle-wrapper" style="display: flex; align-items: center; gap: 5px; font-size: 12px;">
-                    <span>AI</span>
-                    <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                <div class="ai-status-indicator" style="display: flex; align-items: center; gap: 8px; font-size: 11px; background: rgba(0,0,0,0.1); padding: 4px 10px; border-radius: 15px;">
+                    <span id="chat-mode-label">AI Trợ Lý</span>
+                    <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 18px; margin: 0;">
                         <input type="checkbox" id="ai-mode-toggle" checked style="opacity: 0; width: 0; height: 0;">
-                        <span class="slider round" style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px;"></span>
+                        <span class="slider round"></span>
                     </label>
                 </div>
-                <span class="ai-chatbot-close" style="cursor:pointer;"><i class="fas fa-times"></i></span>
+                <span class="ai-chatbot-close" style="cursor:pointer; font-size: 18px;"><i class="fas fa-times"></i></span>
             </div>
         </div>
         <div class="ai-chatbot-messages" id="unified-chat-messages">
