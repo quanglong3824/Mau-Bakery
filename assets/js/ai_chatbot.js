@@ -126,7 +126,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 roomId = data.room_id;
                 localStorage.setItem('chat_room_id', roomId);
-                loadMessages();
             }
         } catch (e) {
             console.error("Failed to send message to DB", e);
@@ -143,23 +142,30 @@ document.addEventListener('DOMContentLoaded', function() {
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ message: text }),
                 });
-
                 const aiData = await aiRes.json();
                 typingIndicator.style.display = 'none';
 
                 if (aiData.response) {
+                    // Add AI response directly to UI for immediate feedback
+                    addMessage(aiData.response, 'bot');
+                    
                     // Save AI response to DB so admin can see it
                     await fetch('api/chat_action.php?action=send', {
                         method: 'POST',
                         headers: {'Content-Type': 'application/json'},
-                        body: JSON.stringify({ room_id: roomId, message: aiData.response, role: 'admin' }) // Role admin/bot to appear on left
+                        body: JSON.stringify({ room_id: roomId, message: aiData.response, role: 'admin' })
                     });
-                    loadMessages();
+                } else if (aiData.error) {
+                    addMessage("Lỗi AI: " + aiData.error, 'bot');
                 }
             } catch (error) {
                 typingIndicator.style.display = 'none';
+                addMessage("Lỗi kết nối AI: " + error.message, 'bot');
                 console.error('AI Chat Error:', error);
             }
+        } else {
+            // If AI is disabled, just reload messages to show user's message
+            loadMessages();
         }
     };
 
