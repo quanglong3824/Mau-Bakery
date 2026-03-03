@@ -9,9 +9,21 @@ if (isset($err_review)) {
 }
 
 if (!$order) {
-    echo "<div class='container mt-2'>
-    <h3>Đơn hàng không tồn tại hoặc bạn không có quyền truy cập!</h3><a href='index.php'>Về trang chủ</a>
-</div>";
+    echo "
+    <div class='container mt-2 mb-2'>
+        <div class='glass-panel' style='padding: 50px; text-align: center; max-width: 500px; margin: 0 auto;'>
+            <div style='font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;'>
+                <i class='fas fa-search-minus'></i>
+            </div>
+            <h3 style='color: #444; margin-bottom: 10px;'>Không tìm thấy đơn hàng!</h3>
+            <p style='color: #777; margin-bottom: 30px; line-height: 1.6;'>
+                Mã đơn hàng không chính xác hoặc bạn không có quyền truy cập thông tin này. Vui lòng kiểm tra lại mã hoặc đăng nhập.
+            </p>
+            <a href='index.php' class='btn-glass btn-primary' style='padding: 10px 25px;'>
+                <i class='fas fa-home'></i> Về trang chủ
+            </a>
+        </div>
+    </div>";
     return;
 }
 ?>

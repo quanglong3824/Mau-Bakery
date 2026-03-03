@@ -2,7 +2,13 @@
 require_once 'controllers/OrderDetailController.php';
 
 if (!$order) {
-    echo "<h3>Đơn hàng không tồn tại hoặc bạn không có quyền truy cập!</h3>";
+    echo "
+    <div style='font-family: Arial, sans-serif; text-align: center; margin-top: 100px;'>
+        <h1 style='color: #ff6b6b; font-size: 50px;'>404 / 403</h1>
+        <h2>Không tìm thấy hóa đơn!</h2>
+        <p style='color: #666;'>Mã hóa đơn không tồn tại hoặc bạn không có quyền in thông tin này.</p>
+    </div>
+    <script>setTimeout(function(){ window.close(); }, 3000);</script>";
     exit;
 }
 ?>
