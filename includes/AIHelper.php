@@ -1,6 +1,6 @@
 <?php
 /**
- * AI Helper for Mau Bakery (Using Alibaba DashScope / OpenAI Protocol)
+ * AI Helper for Mau Bakery (Using Alibaba DashScope Native API)
  */
 
 class AIHelper {
@@ -11,17 +11,17 @@ class AIHelper {
 
     public function __construct($conn) {
         $config = require __DIR__ . '/../config/ai_config.php';
-        $this->apiKey = trim($config['api_key']); // Đảm bảo không có khoảng trắng
+        $this->apiKey = trim($config['api_key']);
         $this->model = $config['model'];
         $this->apiUrl = $config['api_url'];
         $this->conn = $conn;
     }
 
     /**
-     * Send a general message to AI (DashScope / OpenAI)
+     * Send a general message to DashScope API
      */
     public function generateContent($prompt, $system_context = "") {
-        if (empty($this->apiKey) || $this->apiKey === 'YOUR_API_KEY_HERE') {
+        if (empty($this->apiKey)) {
             return "Vui lòng cấu hình API Key trong file config/ai_config.php";
         }
 
@@ -31,43 +31,45 @@ class AIHelper {
         }
         $messages[] = ["role" => "user", "content" => $prompt];
 
+        // DashScope Native Format (Theo hướng dẫn của Qwen)
         $data = [
             "model" => $this->model,
-            "messages" => $messages,
-            "temperature" => 0.7,
-            "max_tokens" => 1024,
-            "stream" => false
+            "input" => [
+                "messages" => $messages
+            ],
+            "parameters" => [
+                "result_format" => "message"
+            ]
         ];
 
         $ch = curl_init($this->apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_POST, true);
         
-        // Header Tối Giản Theo Chuẩn OpenAI (DashScope International hỗ trợ)
+        // Headers theo đúng hướng dẫn
         $headers = [
-            'Content-Type: application/json',
-            'Authorization: Bearer ' . $this->apiKey
+            "Content-Type: application/json",
+            "Authorization: Bearer " . $this->apiKey
         ];
 
         curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Đôi khi lỗi SSL local gây ra lỗi 401 giả, tạm thời tắt để test
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Tránh lỗi SSL local
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-        $error = curl_error($ch);
         curl_close($ch);
 
-        if ($httpCode !== 200) {
-            return "Lỗi khi gọi API (HTTP $httpCode): " . $response . ($error ? " - Curl Error: " . $error : "");
+        if ($httpCode === 200) {
+            $result = json_decode($response, true);
+            // Kiểm tra định dạng phản hồi chuẩn DashScope
+            if (isset($result['output']['choices'][0]['message']['content'])) {
+                return $result['output']['choices'][0]['message']['content'];
+            }
+            return "Lỗi định dạng phản hồi từ DashScope: " . $response;
+        } else {
+            return "Lỗi gọi API DashScope (Mã: $httpCode): " . $response;
         }
-
-        $result = json_decode($response, true);
-        if (isset($result['choices'][0]['message']['content'])) {
-            return $result['choices'][0]['message']['content'];
-        }
-
-        return "Không nhận được câu trả lời từ AI. Kết quả thô: " . $response;
     }
 
     /**
