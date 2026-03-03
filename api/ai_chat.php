@@ -1,14 +1,13 @@
 <?php
 /**
- * API for AI Chat (Gemini)
+ * API for AI Chat (Alibaba DashScope / OpenAI Protocol)
  */
 session_start();
 require_once __DIR__ . '/../config/db.php';
-require_once __DIR__ . '/../includes/GeminiAIHelper.php';
+require_once __DIR__ . '/../includes/AIHelper.php';
 
 header('Content-Type: application/json');
 
-// Check if user is logged in (optional, but good for admin context)
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : 'guest';
 
 // Get JSON input
@@ -20,7 +19,7 @@ if (empty($message)) {
     exit;
 }
 
-$ai = new GeminiAIHelper($conn);
+$ai = new AIHelper($conn);
 
 // Determine context based on role
 if ($role === 'admin' || $role === 'staff') {
