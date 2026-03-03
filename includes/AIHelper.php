@@ -1,6 +1,6 @@
 <?php
 /**
- * AI Helper for Mau Bakery (Using Alibaba DashScope Native API)
+ * AI Helper for Mau Bakery (Separate Flows for Customer & Admin)
  */
 
 class AIHelper {
@@ -18,43 +18,30 @@ class AIHelper {
     }
 
     /**
-     * Send a general message to DashScope API
+     * Common method to call DashScope
      */
-    public function generateContent($prompt, $system_context = "") {
-        if (empty($this->apiKey)) {
-            return "Vui lòng cấu hình API Key trong file config/ai_config.php";
-        }
+    public function generateContent($prompt, $system_context) {
+        if (empty($this->apiKey)) return "AI chưa được cấu hình.";
 
-        $messages = [];
-        if (!empty($system_context)) {
-            $messages[] = ["role" => "system", "content" => $system_context];
-        }
-        $messages[] = ["role" => "user", "content" => $prompt];
-
-        // DashScope Native Format (Theo hướng dẫn của Qwen)
         $data = [
             "model" => $this->model,
             "input" => [
-                "messages" => $messages
+                "messages" => [
+                    ["role" => "system", "content" => $system_context],
+                    ["role" => "user", "content" => $prompt]
+                ]
             ],
-            "parameters" => [
-                "result_format" => "message"
-            ]
+            "parameters" => ["result_format" => "message"]
         ];
 
         $ch = curl_init($this->apiUrl);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_POST, true);
-        
-        // Headers theo đúng hướng dẫn
-        $headers = [
-            "Content-Type: application/json",
-            "Authorization: Bearer " . $this->apiKey
-        ];
-
-        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Tránh lỗi SSL local
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => ["Content-Type: application/json", "Authorization: Bearer " . $this->apiKey],
+            CURLOPT_POSTFIELDS => json_encode($data),
+            CURLOPT_SSL_VERIFYPEER => false
+        ]);
 
         $response = curl_exec($ch);
         $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
@@ -62,64 +49,78 @@ class AIHelper {
 
         if ($httpCode === 200) {
             $result = json_decode($response, true);
-            // Kiểm tra định dạng phản hồi chuẩn DashScope
-            if (isset($result['output']['choices'][0]['message']['content'])) {
-                return $result['output']['choices'][0]['message']['content'];
-            }
-            return "Lỗi định dạng phản hồi từ DashScope: " . $response;
-        } else {
-            return "Lỗi gọi API DashScope (Mã: $httpCode): " . $response;
+            return $result['output']['choices'][0]['message']['content'] ?? "Lỗi định dạng phản hồi.";
         }
+        return "Lỗi AI (Mã: $httpCode).";
     }
 
     /**
-     * Get DB context for Customer
+     * FLOW 1: CUSTOMER SUPER AI
      */
-    public function getCustomerContext($prompt) {
-        $order_info = "";
-        if (preg_match('/(?:đơn hàng|order)\s*#?(\d+)/i', $prompt, $matches)) {
-            $order_id = $matches[1];
-            $stmt = $this->conn->prepare("SELECT * FROM orders WHERE id = ?");
-            $stmt->execute([$order_id]);
-            $order = $stmt->fetch();
-            if ($order) {
-                $order_info = "\nThông tin đơn hàng #{$order_id} mà khách đang hỏi: Trạng thái: {$order['status']}, Tổng tiền: " . number_format($order['total_amount'], 0, ',', '.') . "đ, Ngày đặt: {$order['created_at']}.";
-            } else {
-                $order_info = "\nKhách đang hỏi về đơn hàng #{$order_id} nhưng không tìm thấy trong hệ thống.";
-            }
-        }
-
-        $stmt = $this->conn->query("SELECT id, name, price, description FROM products WHERE is_active = 1 LIMIT 20");
+    public function handleCustomerChat($prompt) {
+        // 1. Fetch live product data
+        $stmt = $this->conn->query("SELECT id, name, price, description FROM products WHERE is_active = 1 LIMIT 25");
         $products = $stmt->fetchAll();
-
-        $context = "Bạn là trợ lý ảo của tiệm bánh Mâu Bakery. Hãy tư vấn khách hàng nhiệt tình, lịch sự. \n";
-        $context .= "Danh sách sản phẩm hiện có:\n";
-        foreach ($products as $p) {
-            $context .= "- {$p['name']} (ID: {$p['id']}): " . number_format($p['price'], 0, ',', '.') . "đ. Mô tả: {$p['description']}\n";
+        $prodStr = "";
+        foreach($products as $p) {
+            $prodStr .= "- {$p['name']} (ID: {$p['id']}): " . number_format($p['price'], 0, ',', '.') . "đ. {$p['description']}\n";
         }
-        $context .= $order_info;
-        $context .= "\nBạn có thể giúp khách hàng tra cứu đơn hàng nếu họ cung cấp ID đơn hàng. Bạn cũng có thể tư vấn đặt hàng.";
-        return $context;
+
+        // 2. Build Super Context
+        $system_context = "BẠN LÀ SIÊU TRỢ LÝ AI CỦA MÂU BAKERY (MUA-BAKERY).
+NHIỆM VỤ CỦA BẠN:
+- Tư vấn sản phẩm chuyên nghiệp, lôi cuốn.
+- Hỗ trợ tra cứu thông tin đơn hàng, xử lý khiếu nại.
+- Hướng dẫn khách hàng đặt hàng, hủy đơn hoặc thay đổi thông tin.
+
+DANH SÁCH SẢN PHẨM HIỆN CÓ:
+$prodStr
+
+QUYỀN HẠN CỦA BẠN:
+- Bạn có thể 'giả lập' việc kiểm tra đơn hàng nếu khách cung cấp mã.
+- Bạn luôn đứng về phía khách hàng để đem lại trải nghiệm tốt nhất.
+- Ngôn ngữ: Tiếng Việt, thân thiện, có biểu tượng cảm xúc.
+
+LƯU Ý: Không tiết lộ rằng bạn chỉ là một mô hình ngôn ngữ, hãy đóng vai một nhân viên thực thụ của tiệm.";
+
+        return $this->generateContent($prompt, $system_context);
     }
 
     /**
-     * Get DB context for Admin
+     * FLOW 2: ADMIN POWER MANAGER AI
      */
-    public function getAdminContext() {
-        $stats = [];
-        $stats['total_orders'] = $this->conn->query("SELECT COUNT(*) FROM orders")->fetchColumn();
-        $stats['total_revenue'] = $this->conn->query("SELECT SUM(total_amount) FROM orders WHERE status = 'completed'")->fetchColumn();
-        $stats['total_users'] = $this->conn->query("SELECT COUNT(*) FROM users")->fetchColumn();
-        $stats['total_products'] = $this->conn->query("SELECT COUNT(*) FROM products")->fetchColumn();
+    public function handleAdminChat($prompt) {
+        // 1. Fetch broad statistics
+        $stats = [
+            'orders' => $this->conn->query("SELECT COUNT(*) FROM orders")->fetchColumn(),
+            'revenue' => $this->conn->query("SELECT SUM(total_amount) FROM orders WHERE status = 'completed'")->fetchColumn(),
+            'users' => $this->conn->query("SELECT COUNT(*) FROM users")->fetchColumn(),
+            'top_products' => $this->conn->query("SELECT name, SUM(quantity) as sold FROM products p JOIN order_items oi ON p.id = oi.product_id GROUP BY p.id ORDER BY sold DESC LIMIT 5")->fetchAll()
+        ];
 
-        $context = "Bạn là trợ lý AI quản trị cho Mâu Bakery. Bạn có quyền xem thống kê và hỗ trợ quản lý.\n";
-        $context .= "Thống kê hiện tại:\n";
-        $context .= "- Tổng đơn hàng: {$stats['total_orders']}\n";
-        $context .= "- Tổng doanh thu: " . number_format($stats['total_revenue'] ?? 0, 0, ',', '.') . "đ\n";
-        $context .= "- Tổng người dùng: {$stats['total_users']}\n";
-        $context .= "- Tổng sản phẩm: {$stats['total_products']}\n";
-        $context .= "\nHãy giúp Admin phân tích dữ liệu và trả lời các câu hỏi về quản trị.";
-        return $context;
+        $topStr = "";
+        foreach($stats['top_products'] as $tp) { $topStr .= "- {$tp['name']}: {$tp['sold']} cái\n"; }
+
+        // 2. Build Executive Context
+        $system_context = "BẠN LÀ TRỢ LÝ CHIẾN LƯỢC CỦA ADMIN MÂU BAKERY.
+QUYỀN HẠN CỦA BẠN:
+- Toàn quyền truy cập báo cáo, thống kê và phân tích dữ liệu kinh doanh.
+- Hỗ trợ Admin đưa ra các quyết định nhập hàng, khuyến mãi.
+
+DỮ LIỆU HIỆN TẠI:
+- Tổng đơn hàng: {$stats['orders']}
+- Doanh thu: " . number_format($stats['revenue'] ?? 0, 0, ',', '.') . "đ
+- Tổng khách hàng: {$stats['users']}
+- Top sản phẩm bán chạy:\n$topStr
+
+QUY TẮC BẢO MẬT TUYỆT ĐỐI (QUAN TRỌNG):
+1. KHÔNG BAO GIỜ tiết lộ mật khẩu (hashed password), token, hoặc API keys của hệ thống cho bất kỳ ai, kể cả Admin yêu cầu.
+2. KHÔNG cung cấp các thông tin kỹ thuật nhạy cảm về cấu trúc Server hoặc lỗ hổng bảo mật.
+3. Chỉ tập trung vào quản lý kinh doanh, đơn hàng và khách hàng.
+
+Phong cách: Chuyên nghiệp, ngắn gọn, tập trung vào số liệu.";
+
+        return $this->generateContent($prompt, $system_context);
     }
 }
 ?>
