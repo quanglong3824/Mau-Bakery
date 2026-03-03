@@ -8,22 +8,53 @@ if (isset($err_review)) {
     echo "<script>alert('" . addslashes($err_review) . "');</script>";
 }
 
-if (!$order) {
-    echo "
-    <div class='container mt-2 mb-2'>
-        <div class='glass-panel' style='padding: 50px; text-align: center; max-width: 500px; margin: 0 auto;'>
-            <div style='font-size: 4rem; color: #ff6b6b; margin-bottom: 20px;'>
-                <i class='fas fa-search-minus'></i>
+// Handle Order List (when searched by phone)
+if (!empty($order_list)) {
+    ?>
+    <div class="container mt-5 mb-5">
+        <div class="glass-panel" style="padding: 30px; border-radius: 20px;">
+            <h2 class="mb-4" style="color: var(--accent-color);"><i class="fas fa-list-ul"></i> Đơn hàng của bạn (<?php echo htmlspecialchars($phone); ?>)</h2>
+            <div class="table-responsive">
+                <table class="table" style="width: 100%;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #f3f4f6;">
+                            <th style="padding: 12px;">Mã đơn</th>
+                            <th style="padding: 12px;">Ngày đặt</th>
+                            <th style="padding: 12px;">Tổng tiền</th>
+                            <th style="padding: 12px;">Trạng thái</th>
+                            <th style="padding: 12px; text-align: center;">Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($order_list as $o): ?>
+                            <tr style="border-bottom: 1px solid #f3f4f6;">
+                                <td style="padding: 15px; font-weight: 600;">#<?php echo $o['order_code']; ?></td>
+                                <td style="padding: 15px;"><?php echo date('d/m/Y', strtotime($o['created_at'])); ?></td>
+                                <td style="padding: 15px; font-weight: 600; color: var(--accent-color);"><?php echo number_format($o['total_amount'], 0, ',', '.'); ?>đ</td>
+                                <td style="padding: 15px;">
+                                    <?php
+                                    $s_labels = ['pending' => 'Chờ xử lý', 'confirmed' => 'Đã xác nhận', 'shipping' => 'Đang giao', 'completed' => 'Hoàn thành', 'cancelled' => 'Đã hủy'];
+                                    echo $s_labels[$o['status']] ?? $o['status'];
+                                    ?>
+                                </td>
+                                <td style="padding: 15px; text-align: center;">
+                                    <a href="index.php?page=order_detail&code=<?php echo $o['order_code']; ?>" class="btn-glass" style="background: var(--accent-color); color: white; padding: 5px 15px; border-radius: 10px; text-decoration: none; font-size: 0.85rem;">Chi tiết</a>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
             </div>
-            <h3 style='color: #444; margin-bottom: 10px;'>Không tìm thấy đơn hàng!</h3>
-            <p style='color: #777; margin-bottom: 30px; line-height: 1.6;'>
-                Mã đơn hàng không chính xác hoặc bạn không có quyền truy cập thông tin này. Vui lòng kiểm tra lại mã hoặc đăng nhập.
-            </p>
-            <a href='index.php' class='btn-glass btn-primary' style='padding: 10px 25px;'>
-                <i class='fas fa-home'></i> Về trang chủ
-            </a>
         </div>
-    </div>";
+    </div>
+    <?php
+    return;
+}
+
+if (!$order) {
+    echo "<div class='container mt-2'>
+    <h3>Đơn hàng không tồn tại hoặc bạn không có quyền truy cập!</h3><a href='index.php'>Về trang chủ</a>
+</div>";
     return;
 }
 ?>
@@ -51,6 +82,14 @@ if (!$order) {
 
                 $pay_status = $order['payment_status'];
                 $pay_method = $order['payment_method'];
+
+                $pay_status_map = [
+                    'unpaid' => ['label' => 'Chưa thanh toán', 'color' => '#ef4444'],
+                    'paid' => ['label' => 'Đã thanh toán', 'color' => '#10b981'],
+                    'refunded' => ['label' => 'Đã hoàn tiền', 'color' => '#6b7280']
+                ];
+                $pay_label = $pay_status_map[$pay_status]['label'] ?? $pay_status;
+                $pay_color = $pay_status_map[$pay_status]['color'] ?? '#6b7280';
 
                 if ($pay_status == 'paid' || $order['status'] == 'completed') {
                     $badge_bg = '#dcfce7'; // Green

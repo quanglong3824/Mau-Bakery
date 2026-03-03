@@ -104,15 +104,16 @@ include 'includes/header.php';
                             <?php endif; ?>
                         </form>
 
-                        <button class="btn btn-sm btn-secondary"
-                            onclick="alert('Tính năng xem chi tiết đang phát triển...')" title="Xem chi tiết">
+                        <a href="order_detail.php?id=<?php echo $order['id']; ?>" class="btn btn-sm btn-secondary" title="Xem chi tiết">
                             <i class="fas fa-eye"></i>
-                        </button>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
         </tbody>
     </table>
 </div>
+
+<?php echo render_pagination($current_page, $total_pages, 'orders.php?'); ?>
 
 <?php include 'includes/footer.php'; ?>

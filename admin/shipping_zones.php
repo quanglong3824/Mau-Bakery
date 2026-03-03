@@ -1,38 +1,28 @@
 <?php
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
-
 session_start();
-require_once 'includes/auth_check.php';
 require_once 'controllers/ShippingZoneController.php';
-
-$controller = new ShippingZoneController($conn);
-$controller->handleRequest();
-$zones = $controller->getZones();
+include 'includes/header.php';
 ?>
 
-<!-- Module CSS -->
-<link rel="stylesheet" href="assets/css/shipping_zones.css">
-
-<?php include 'includes/header.php'; ?>
-
-<div class="page-header">
-    <h2 class="page-title">Quản lý Khu vực Ship (Shipping Zones)</h2>
-    <a href="#" class="btn-add" onclick="openAddModal()">
+<div class="header-bar">
+    <h1 class="page-title">Quản lý Khu vực Ship</h1>
+    <button class="btn btn-primary" onclick="document.getElementById('addZoneModal').style.display='flex'">
         <i class="fas fa-plus"></i> Thêm Khu Vực
-    </a>
+    </button>
 </div>
 
-<!-- Zones Table -->
-<div class="table-container">
-    <table>
+<?php if (isset($_GET['success'])): ?>
+    <div class="alert alert-success">Thao tác thành công!</div>
+<?php endif; ?>
+
+<div class="glass-panel p-0 overflow-hidden">
+    <table class="table mb-0">
         <thead>
             <tr>
                 <th>Khu vực / Quận Huyện</th>
                 <th>Phí Ship (VNĐ)</th>
                 <th>Trạng thái</th>
-                <th>Hành động</th>
+                <th style="text-align: center;">Hành động</th>
             </tr>
         </thead>
         <tbody>
@@ -47,20 +37,17 @@ $zones = $controller->getZones();
                         <?php echo number_format($zone['fee'], 0, ',', '.'); ?> đ
                     </td>
                     <td>
-                        <a href="shipping_zones.php?action=toggle&id=<?php echo $zone['id']; ?>"
-                            class="status-badge <?php echo $zone['is_active'] ? 'active' : 'inactive'; ?>" style="padding: 5px 10px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; 
-                                   background: <?php echo $zone['is_active'] ? 'rgba(46, 204, 113, 0.15)' : 'rgba(231, 76, 60, 0.15)'; ?>; 
-                                   color: <?php echo $zone['is_active'] ? '#2ecc71' : '#e74c3c'; ?>;">
+                        <a href="shipping_zones.php?action=toggle&id=<?php echo $zone['id']; ?>" class="badge <?php echo $zone['is_active'] ? 'bg-success' : 'bg-secondary'; ?>">
                             <?php echo $zone['is_active'] ? 'Hoạt động' : 'Tạm ẩn'; ?>
                         </a>
                     </td>
-                    <td>
-                        <button class="action-btn btn-edit" onclick='openEditModal(<?php echo json_encode($zone); ?>)'>
+                    <td style="text-align: center;">
+                        <button class="btn btn-sm btn-info text-white" onclick='openEditModal(<?php echo json_encode($zone); ?>)'>
                             <i class="fas fa-edit"></i>
                         </button>
-                        <button class="action-btn btn-delete" onclick="confirmDelete(<?php echo $zone['id']; ?>)">
+                        <a href="shipping_zones.php?action=delete&id=<?php echo $zone['id']; ?>" class="btn btn-sm btn-danger" onclick="return confirm('Bạn chắc chắn muốn xóa?')">
                             <i class="fas fa-trash"></i>
-                        </button>
+                        </a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -68,67 +55,56 @@ $zones = $controller->getZones();
     </table>
 </div>
 
-</main>
+<?php echo render_pagination($current_page, $total_pages, 'shipping_zones.php?'); ?>
 
 <!-- ADD MODAL -->
-<div id="addZoneModal" class="modal-overlay">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('addZoneModal')">&times;</span>
-        <h3 style="margin-bottom: 20px; color: var(--accent-color);">Thêm Khu Vực Mới</h3>
-
+<div id="addZoneModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="glass-panel" style="background: white; width: 90%; max-width: 500px; padding: 30px; border-radius: 20px;">
+        <h3 class="mb-4">Thêm Khu Vực Mới</h3>
         <form action="" method="POST">
-            <div class="form-group">
-                <label>Tên Quận/Huyện</label>
-                <input type="text" name="name" class="form-control" placeholder="Ví dụ: Quận 1, TP. Thủ Đức..."
-                    required>
+            <div class="mb-3">
+                <label class="form-label">Tên Quận/Huyện</label>
+                <input type="text" name="name" class="form-control" placeholder="Ví dụ: Quận 1, TP. Thủ Đức..." required>
             </div>
-
-            <div class="form-group">
-                <label>Phí Ship (VNĐ)</label>
+            <div class="mb-3">
+                <label class="form-label">Phí Ship (VNĐ)</label>
                 <input type="number" name="fee" class="form-control" placeholder="0" required>
             </div>
-
-            <div class="form-group">
+            <div class="mb-4">
                 <label>
                     <input type="checkbox" name="is_active" checked> Kích hoạt ngay
                 </label>
             </div>
-
-            <button type="submit" name="add_zone" class="btn-add" style="width: 100%; justify-content: center;">
-                Lưu
-            </button>
+            <div class="text-end">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('addZoneModal').style.display='none'">Hủy</button>
+                <button type="submit" name="add_zone" class="btn btn-primary">Lưu</button>
+            </div>
         </form>
     </div>
 </div>
 
 <!-- EDIT MODAL -->
-<div id="editZoneModal" class="modal-overlay">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal('editZoneModal')">&times;</span>
-        <h3 style="margin-bottom: 20px; color: var(--accent-color);">Cập nhật Khu Vực</h3>
-
+<div id="editZoneModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+    <div class="glass-panel" style="background: white; width: 90%; max-width: 500px; padding: 30px; border-radius: 20px;">
+        <h3 class="mb-4">Cập nhật Khu Vực</h3>
         <form action="" method="POST">
             <input type="hidden" name="id" id="edit_id">
-
-            <div class="form-group">
-                <label>Tên Quận/Huyện</label>
+            <div class="mb-3">
+                <label class="form-label">Tên Quận/Huyện</label>
                 <input type="text" name="name" id="edit_name" class="form-control" required>
             </div>
-
-            <div class="form-group">
-                <label>Phí Ship (VNĐ)</label>
+            <div class="mb-4">
+                <label class="form-label">Phí Ship (VNĐ)</label>
                 <input type="number" name="fee" id="edit_fee" class="form-control" required>
             </div>
-
-            <button type="submit" name="edit_zone" class="btn-add" style="width: 100%; justify-content: center;">
-                Cập nhật
-            </button>
+            <div class="text-end">
+                <button type="button" class="btn btn-secondary" onclick="document.getElementById('editZoneModal').style.display='none'">Hủy</button>
+                <button type="submit" name="edit_zone" class="btn btn-primary">Cập nhật</button>
+            </div>
         </form>
     </div>
 </div>
 
 <script src="assets/js/shipping_zones.js"></script>
 
-</body>
-
-</html>
+<?php include 'includes/footer.php'; ?>

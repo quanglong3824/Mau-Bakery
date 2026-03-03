@@ -46,3 +46,19 @@ document.addEventListener('keydown', function (event) {
         toggleMenu();
     }
 });
+
+// Global Order Tracking Function
+function checkOrderGlobal(event) {
+    if (event) event.preventDefault();
+    const input = prompt("Vui lòng nhập Mã đơn hàng hoặc Số điện thoại để tra cứu:");
+    
+    if (input && input.trim() !== "") {
+        const value = input.trim();
+        // Simple detection: If only digits and length >= 10, assume phone. Otherwise assume code.
+        if (/^[0-9]{10,11}$/.test(value)) {
+            window.location.href = "index.php?page=order_detail&phone=" + encodeURIComponent(value);
+        } else {
+            window.location.href = "index.php?page=order_detail&code=" + encodeURIComponent(value.toUpperCase());
+        }
+    }
+}

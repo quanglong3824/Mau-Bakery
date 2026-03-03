@@ -29,6 +29,20 @@ if (isset($conn)) {
     $stmt = $conn->query("SELECT COUNT(*) FROM users WHERE role = 'user'");
     $stats['users'] = $stmt->fetchColumn();
 
+    // Chart Data: Sales in the last 7 days
+    $chart_data = [];
+    for ($i = 6; $i >= 0; $i--) {
+        $date = date('Y-m-d', strtotime("-$i days"));
+        $display_date = date('d/m', strtotime("-$i days"));
+        
+        $stmt = $conn->prepare("SELECT SUM(total_amount) FROM orders WHERE status = 'completed' AND DATE(created_at) = :date");
+        $stmt->execute(['date' => $date]);
+        $revenue = $stmt->fetchColumn() ?: 0;
+        
+        $chart_data['labels'][] = $display_date;
+        $chart_data['values'][] = (int)$revenue;
+    }
+
     // Recent Orders (for table)
     $stmt = $conn->query("SELECT * FROM orders ORDER BY created_at DESC LIMIT 5");
     $recent_orders = $stmt->fetchAll(PDO::FETCH_ASSOC);

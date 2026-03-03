@@ -23,6 +23,25 @@ function openEditModal(user) {
     }
 }
 
+function openPermissionModal(userId, permissions) {
+    const modal = document.getElementById('permissionModal');
+    if (modal) {
+        document.getElementById('perm_user_id').value = userId;
+        
+        // Clear all checkboxes first
+        const checkboxes = document.querySelectorAll('.perm-checkbox');
+        checkboxes.forEach(cb => cb.checked = false);
+        
+        // Check the ones that are granted
+        permissions.forEach(p => {
+            const cb = document.querySelector(`.perm-checkbox[value="${p}"]`);
+            if (cb) cb.checked = true;
+        });
+        
+        modal.classList.add('active');
+    }
+}
+
 function closeModal(modalId) {
     const modal = document.getElementById(modalId);
     if (modal) {

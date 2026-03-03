@@ -15,6 +15,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['a
     $note = trim($_POST['note']);
     $payment_method = $_POST['payment_method'];
 
+    // Basic Validation
+    if (empty($recipient_name) || empty($recipient_phone) || empty($_POST['address_specific']) || empty($_POST['district'])) {
+        echo "<script>alert('Vui lòng điền đầy đủ thông tin giao hàng.'); window.history.back();</script>";
+        exit;
+    }
+
+    if (!preg_match('/^[0-9]{10,11}$/', $recipient_phone)) {
+        echo "<script>alert('Số điện thoại không hợp lệ (cần 10-11 chữ số).'); window.history.back();</script>";
+        exit;
+    }
+
     // Handle Address Mapping
     $city = isset($_POST['city']) ? trim($_POST['city']) : 'TP. Hồ Chí Minh';
     $district_id = isset($_POST['district']) ? $_POST['district'] : 0;

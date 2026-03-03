@@ -3,84 +3,67 @@
 
 require_once '../config/db.php';
 require_once 'includes/auth_check.php';
+require_once 'includes/functions.php';
+
+$page_title = "Quản Lý Danh Mục";
 
 $message = "";
 $error = "";
 
-// Handle Actions
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action'])) {
+// Pagination
+$limit = 10;
+$current_page = isset($_GET['page_no']) ? intval($_GET['page_no']) : 1;
 
-    // 1. Delete
-    if ($_POST['action'] == 'delete') {
-        $id = intval($_POST['id']);
+// 1. Delete
+if (isset($_POST['action']) && $_POST['action'] == 'delete') {
+    $id = intval($_POST['id']);
+    try {
+        $stmt = $conn->prepare("UPDATE categories SET is_active = 0 WHERE id = :id");
+        $stmt->execute(['id' => $id]);
+        $message = "Đã xóa danh mục!";
+    } catch (PDOException $e) {
+        $error = "Lỗi: " . $e->getMessage();
+    }
+}
+
+// 2. Add/Edit
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && ($_POST['action'] == 'add' || $_POST['action'] == 'edit')) {
+    $name = trim($_POST['name']);
+    $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
+    $image = trim($_POST['image']);
+
+    if (empty($name)) {
+        $error = "Vui lòng nhập tên danh mục.";
+    } else {
         try {
-            $stmt = $conn->prepare("UPDATE categories SET is_active = 0 WHERE id = :id");
-            $stmt->execute(['id' => $id]);
-            $message = "Đã ẩn danh mục thành công!";
+            if ($_POST['action'] == 'add') {
+                $stmt = $conn->prepare("INSERT INTO categories (name, slug, image) VALUES (:name, :slug, :img)");
+                $stmt->execute(['name' => $name, 'slug' => $slug, 'img' => $image]);
+                $message = "Thêm danh mục thành công!";
+            } else {
+                $id = intval($_POST['id']);
+                $stmt = $conn->prepare("UPDATE categories SET name = :name, slug = :slug, image = :img WHERE id = :id");
+                $stmt->execute(['name' => $name, 'slug' => $slug, 'img' => $image, 'id' => $id]);
+                $message = "Cập nhật danh mục thành công!";
+            }
         } catch (PDOException $e) {
             $error = "Lỗi: " . $e->getMessage();
         }
     }
-
-    // 2. Add/Edit
-    if ($_POST['action'] == 'add' || $_POST['action'] == 'edit') {
-        $name = trim($_POST['name']);
-        $slug = trim($_POST['slug']);
-        $image = trim($_POST['image']); // Default to text input or current image
-
-        // Handle File Upload
-        if (isset($_FILES['image_file']) && $_FILES['image_file']['error'] == 0) {
-            $upload_dir = __DIR__ . '/../../uploads/'; // Absolute path (up 2 levels from admin/controllers)
-            if (!file_exists($upload_dir)) {
-                mkdir($upload_dir, 0777, true);
-            }
-            if (!is_writable($upload_dir)) {
-                chmod($upload_dir, 0777);
-            }
-
-            $file_name = time() . '_cat_' . basename($_FILES['image_file']['name']);
-            $target_file = $upload_dir . $file_name;
-            $image_file_type = strtolower(pathinfo($target_file, PATHINFO_EXTENSION));
-
-            // Allow certain file formats
-            $allowed_types = ['jpg', 'png', 'jpeg', 'gif', 'webp'];
-            if (in_array($image_file_type, $allowed_types)) {
-                if (move_uploaded_file($_FILES['image_file']['tmp_name'], $target_file)) {
-                    $image = 'uploads/' . $file_name; // Save relative path
-                } else {
-                    $error = "Không thể lưu file ảnh vào uploads.";
-                }
-            } else {
-                $error = "Chỉ chấp nhận các định dạng JPG, JPEG, PNG, GIF, WEBP.";
-            }
-        }
-
-        // Simple slug generation if empty
-        if (empty($slug)) {
-            $slug = strtolower(trim(preg_replace('/[^A-Za-z0-9-]+/', '-', $name)));
-        }
-
-        if (empty($name)) {
-            $error = "Tên danh mục không được để trống.";
-        } else {
-            try {
-                if ($_POST['action'] == 'add') {
-                    $stmt = $conn->prepare("INSERT INTO categories (name, slug, image, is_active) VALUES (:name, :slug, :img, 1)");
-                    $stmt->execute(['name' => $name, 'slug' => $slug, 'img' => $image]);
-                    $message = "Đã thêm danh mục mới!";
-                } else {
-                    $id = intval($_POST['id']);
-                    $stmt = $conn->prepare("UPDATE categories SET name = :name, slug = :slug, image = :img WHERE id = :id");
-                    $stmt->execute(['name' => $name, 'slug' => $slug, 'img' => $image, 'id' => $id]);
-                    $message = "Đã cập nhật danh mục!";
-                }
-            } catch (PDOException $e) {
-                $error = "Lỗi: " . $e->getMessage();
-            }
-        }
-    }
 }
 
-// Fetch Categories
-$categories = $conn->query("SELECT * FROM categories WHERE is_active = 1")->fetchAll();
+// Pagination Logic
+$stmt_count = $conn->query("SELECT COUNT(*) FROM categories WHERE is_active = 1");
+$total_records = $stmt_count->fetchColumn();
+$pagin = get_pagination_params($total_records, $current_page, $limit);
+$offset = $pagin['offset'];
+$total_pages = $pagin['total_pages'];
+$current_page = $pagin['current_page'];
+
+// Fetch categories
+$stmt = $conn->prepare("SELECT * FROM categories WHERE is_active = 1 ORDER BY id DESC LIMIT :limit OFFSET :offset");
+$stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+$stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+$stmt->execute();
+$categories = $stmt->fetchAll();
 ?>

@@ -69,6 +69,8 @@ require_once 'includes/header.php';
                         <td>
                             <?php if ($u['role'] == 'admin'): ?>
                                 <span class="badge bg-danger">Admin</span>
+                            <?php elseif ($u['role'] == 'staff'): ?>
+                                <span class="badge bg-warning text-dark">Staff</span>
                             <?php else: ?>
                                 <span class="badge bg-info text-white">User</span>
                             <?php endif; ?>
@@ -83,6 +85,14 @@ require_once 'includes/header.php';
                         <td>
                             <?php if ($u['role'] != 'admin'): ?>
                                 <div class="action-buttons">
+                                    <!-- Permissions Button (only for staff) -->
+                                    <?php if ($u['role'] == 'staff'): ?>
+                                        <button class="btn btn-sm btn-dark"
+                                            onclick='openPermissionModal(<?php echo $u['id']; ?>, <?php echo json_encode(get_user_permissions($u['id'], $conn)); ?>)' title="Phân quyền">
+                                            <i class="fas fa-key"></i>
+                                        </button>
+                                    <?php endif; ?>
+
                                     <!-- Edit Button -->
                                     <button class="btn btn-sm btn-info text-white"
                                         onclick='openEditModal(<?php echo json_encode($u); ?>)' title="Sửa thông tin">
@@ -125,6 +135,8 @@ require_once 'includes/header.php';
             </tbody>
         </table>
     </div>
+    
+    <?php echo render_pagination($current_page, $total_pages, 'users.php?'); ?>
 </div>
 
 <!-- Add User Modal -->
@@ -163,6 +175,7 @@ require_once 'includes/header.php';
                 <label>Vai trò</label>
                 <select name="role" class="form-control">
                     <option value="user">Người dùng (User)</option>
+                    <option value="staff">Nhân viên (Staff)</option>
                     <option value="admin">Quản trị viên (Admin)</option>
                 </select>
             </div>
@@ -213,6 +226,7 @@ require_once 'includes/header.php';
                 <label>Vai trò</label>
                 <select name="role" id="edit_role" class="form-control">
                     <option value="user">Người dùng (User)</option>
+                    <option value="staff">Nhân viên (Staff)</option>
                     <option value="admin">Quản trị viên (Admin)</option>
                 </select>
             </div>
@@ -220,6 +234,49 @@ require_once 'includes/header.php';
             <div class="modal-actions">
                 <button type="button" class="btn btn-secondary" onclick="closeModal('editUserModal')">Hủy</button>
                 <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Permission Modal -->
+<div id="permissionModal" class="modal-overlay">
+    <div class="modal-box glass-panel">
+        <h3 class="modal-title">Phân Quyền Nhân Viên</h3>
+        <form method="POST">
+            <input type="hidden" name="action" value="update_permissions">
+            <input type="hidden" name="user_id" id="perm_user_id">
+
+            <div class="permissions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <?php
+                $available_permissions = [
+                    'index.php' => 'Dashboard',
+                    'statistics.php' => 'Thống Kê',
+                    'orders.php' => 'Đơn Hàng',
+                    'vouchers.php' => 'Mã Giảm Giá',
+                    'support.php' => 'Hỗ Trợ (Chat)',
+                    'products.php' => 'Sản Phẩm',
+                    'categories.php' => 'Danh Mục',
+                    'tags.php' => 'Gợi ý (Tags)',
+                    'shipping_zones.php' => 'Khu vực Ship',
+                    'users.php' => 'Khách Hàng',
+                    'media.php' => 'Thư Viện Ảnh',
+                    'settings.php' => 'Cài Đặt'
+                ];
+                foreach ($available_permissions as $key => $label):
+                ?>
+                <div class="permission-item">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" name="permissions[]" value="<?php echo $key; ?>" class="perm-checkbox">
+                        <?php echo $label; ?>
+                    </label>
+                </div>
+                <?php endforeach; ?>
+            </div>
+
+            <div class="modal-actions">
+                <button type="button" class="btn btn-secondary" onclick="closeModal('permissionModal')">Hủy</button>
+                <button type="submit" class="btn btn-primary">Lưu quyền hạn</button>
             </div>
         </form>
     </div>

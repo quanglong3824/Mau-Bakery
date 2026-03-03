@@ -34,28 +34,38 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     }
 }
 
-// Get Order ID or Code
+// Get Order ID, Code, or Phone
 $order_id = isset($_GET['id']) ? intval($_GET['id']) : 0;
-$order_code = isset($_GET['code']) ? trim($_GET['code']) : '';
+$order_code = isset($_GET['code']) ? strtoupper(trim($_GET['code'])) : '';
+$phone = isset($_GET['phone']) ? trim($_GET['phone']) : '';
 $order = null;
+$order_list = []; // For multiple orders by phone
 
-if (isset($conn) && ($order_id > 0 || !empty($order_code))) {
-    // 1. Fetch Order Data 
-    if ($order_id > 0 && isset($_SESSION['user_id'])) {
-        // Logged in user tracking by ID
-        $stmt = $conn->prepare("SELECT * FROM orders WHERE id = :id AND user_id = :user_id");
-        $stmt->execute(['id' => $order_id, 'user_id' => $_SESSION['user_id']]);
-    } else if (!empty($order_code)) {
-        // Guest or User tracking by code
+if (isset($conn)) {
+    $order_data = null;
+    
+    if (!empty($order_code)) {
+        // 1. PUBLIC SEARCH BY CODE
         $stmt = $conn->prepare("SELECT * FROM orders WHERE order_code = :code");
         $stmt->execute(['code' => $order_code]);
-    } else {
-        // Should not happen, but just in case
-        $stmt = $conn->prepare("SELECT * FROM orders WHERE id = -1");
-        $stmt->execute();
+        $order_data = $stmt->fetch();
+    } elseif (!empty($phone)) {
+        // 2. SEARCH BY PHONE (Returns list of orders)
+        $stmt = $conn->prepare("SELECT * FROM orders WHERE recipient_phone = :phone ORDER BY created_at DESC LIMIT 10");
+        $stmt->execute(['phone' => $phone]);
+        $order_list = $stmt->fetchAll();
+        
+        // If only one order found, treat it as direct view
+        if (count($order_list) === 1) {
+            $order_data = $order_list[0];
+            $order_list = [];
+        }
+    } elseif ($order_id > 0 && isset($_SESSION['user_id'])) {
+        // 2. PRIVATE SEARCH BY ID (Logged in)
+        $stmt = $conn->prepare("SELECT * FROM orders WHERE id = :id AND user_id = :user_id");
+        $stmt->execute(['id' => $order_id, 'user_id' => $_SESSION['user_id']]);
+        $order_data = $stmt->fetch();
     }
-
-    $order_data = $stmt->fetch();
 
     if ($order_data) {
         $order_id = $order_data['id']; // make sure $order_id is set for items fetch

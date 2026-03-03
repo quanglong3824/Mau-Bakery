@@ -96,6 +96,10 @@ class AuthController
             // Validation
             if (empty($this->full_name) || empty($this->email) || empty($password)) {
                 $this->error = "Vui lòng nhập đầy đủ thông tin bắt buộc.";
+            } elseif (!filter_var($this->email, FILTER_VALIDATE_EMAIL)) {
+                $this->error = "Định dạng email không hợp lệ.";
+            } elseif (!preg_match('/^[0-9]{10,11}$/', $this->phone) && !empty($this->phone)) {
+                $this->error = "Số điện thoại phải từ 10-11 chữ số.";
             } elseif ($password !== $confirm_password) {
                 $this->error = "Mật khẩu xác nhận không khớp.";
             } elseif (strlen($password) < 6) {

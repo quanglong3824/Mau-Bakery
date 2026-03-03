@@ -67,6 +67,8 @@ require_once 'includes/header.php';
             </tbody>
         </table>
     </div>
+
+    <?php echo render_pagination($current_page, $total_pages, 'categories.php?'); ?>
 </div>
 
 <!-- Modal -->

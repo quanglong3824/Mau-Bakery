@@ -3,6 +3,13 @@ session_start();
 // Include Controller
 require_once 'controllers/DashboardController.php';
 
+// ONE-TIME SEEDER FOR TESTING
+if (isset($_GET['seed_test_data'])) {
+    require_once 'seed_data.php';
+    echo "<script>alert('Đã nạp 22 đơn hàng thực tế!'); window.location.href='index.php';</script>";
+    exit;
+}
+
 include 'includes/header.php';
 ?>
 <link rel="stylesheet" href="assets/css/index.css">
@@ -139,6 +146,11 @@ include 'includes/header.php';
                             </td>
                             <td style="padding: 16px 12px; color: #6b7280;">
                                 <?php echo date('d/m/Y H:i', strtotime($order['created_at'])); ?>
+                            </td>
+                            <td style="padding: 16px 12px; text-align: center;">
+                                <a href="order_detail.php?id=<?php echo $order['id']; ?>" style="color: #6b7280;">
+                                    <i class="fas fa-eye"></i>
+                                </a>
                             </td>
                         </tr>
                         <?php
