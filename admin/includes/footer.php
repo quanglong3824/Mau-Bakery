@@ -21,7 +21,7 @@
     </div>
 
     <link rel="stylesheet" href="../assets/css/ai_chatbot.css">
-    <script src="../assets/js/ai_chatbot.js"></script>
+    <script src="assets/js/ai_admin.js"></script>
 
     <!-- Main Wrapper End -->
 

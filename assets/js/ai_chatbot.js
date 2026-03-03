@@ -118,7 +118,7 @@ document.addEventListener('DOMContentLoaded', function() {
             messagesContainer.scrollTop = messagesContainer.scrollHeight;
 
             try {
-                const aiRes = await fetch('api/ai_chat.php', {
+                const aiRes = await fetch('api/ai_customer.php', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({ message: text }),
