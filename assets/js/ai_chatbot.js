@@ -1,64 +1,133 @@
-/* AI Chatbot JS */
+/* Unified AI & Human Chatbot JS */
 document.addEventListener('DOMContentLoaded', function() {
     const toggle = document.querySelector('.ai-chatbot-toggle');
-    const window = document.querySelector('.ai-chatbot-window');
+    const windowEl = document.querySelector('.ai-chatbot-window');
     const closeBtn = document.querySelector('.ai-chatbot-close');
-    const sendBtn = document.querySelector('.ai-chatbot-send');
-    const input = document.querySelector('.ai-chatbot-input input');
-    const messages = document.querySelector('.ai-chatbot-messages');
-    const typingIndicator = document.querySelector('.typing-indicator');
+    const sendBtn = document.getElementById('unified-chat-send');
+    const input = document.getElementById('unified-chat-input');
+    const messagesContainer = document.getElementById('unified-chat-messages');
+    const typingIndicator = document.getElementById('ai-typing');
+    const aiModeToggle = document.getElementById('ai-mode-toggle');
 
     if (!toggle) return;
 
+    let roomId = localStorage.getItem('chat_room_id');
+    let pollInterval = null;
+    let lastMessageCount = 0;
+
     toggle.addEventListener('click', () => {
-        window.classList.toggle('active');
-        if (window.classList.contains('active')) {
+        windowEl.classList.toggle('active');
+        if (windowEl.classList.contains('active')) {
             input.focus();
+            startPolling();
+        } else {
+            stopPolling();
         }
     });
 
     closeBtn.addEventListener('click', () => {
-        window.classList.remove('active');
+        windowEl.classList.remove('active');
+        stopPolling();
     });
 
     const addMessage = (text, sender) => {
         const msgDiv = document.createElement('div');
-        msgDiv.classList.add('ai-message', sender);
+        msgDiv.classList.add('ai-message', sender === 'user' ? 'user' : 'bot');
         msgDiv.textContent = text;
-        messages.appendChild(msgDiv);
-        messages.scrollTop = messages.scrollHeight;
+        messagesContainer.appendChild(msgDiv);
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
     };
+
+    const startPolling = () => {
+        loadMessages();
+        if (!pollInterval) {
+            pollInterval = setInterval(loadMessages, 3000);
+        }
+    };
+
+    const stopPolling = () => {
+        if (pollInterval) {
+            clearInterval(pollInterval);
+            pollInterval = null;
+        }
+    };
+
+    async function loadMessages() {
+        try {
+            const res = await fetch(`api/chat_action.php?action=fetch&room_id=${roomId || ''}&role=user`);
+            const data = await res.json();
+            if (data.success) {
+                if (data.room_id) {
+                    roomId = data.room_id;
+                    localStorage.setItem('chat_room_id', roomId);
+                }
+                
+                // Only re-render if message count changed
+                if (data.messages.length !== lastMessageCount) {
+                    messagesContainer.innerHTML = '';
+                    data.messages.forEach(m => {
+                        addMessage(m.message, m.role);
+                    });
+                    lastMessageCount = data.messages.length;
+                }
+            }
+        } catch (e) {
+            console.error("Failed to load messages", e);
+        }
+    }
 
     const sendMessage = async () => {
         const text = input.value.trim();
         if (!text) return;
 
-        addMessage(text, 'user');
         input.value = '';
-        typingIndicator.style.display = 'block';
-        messages.scrollTop = messages.scrollHeight;
+        const isAiEnabled = aiModeToggle.checked;
 
+        // 1. Save user message to DB (Human chat system)
         try {
-            const response = await fetch('/api/ai_chat.php', {
+            const res = await fetch('api/chat_action.php?action=send', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ message: text }),
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ room_id: roomId, message: text, role: 'user' })
             });
-
-            const data = await response.json();
-            typingIndicator.style.display = 'none';
-
-            if (data.response) {
-                addMessage(data.response, 'bot');
-            } else if (data.error) {
-                addMessage('Lỗi: ' + data.error, 'bot');
+            const data = await res.json();
+            if (data.success) {
+                roomId = data.room_id;
+                localStorage.setItem('chat_room_id', roomId);
+                loadMessages();
             }
-        } catch (error) {
-            typingIndicator.style.display = 'none';
-            addMessage('Không thể kết nối với AI. Vui lòng thử lại sau.', 'bot');
-            console.error('AI Chat Error:', error);
+        } catch (e) {
+            console.error("Failed to send message to DB", e);
+        }
+
+        // 2. If AI is enabled, get AI response
+        if (isAiEnabled) {
+            typingIndicator.style.display = 'block';
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+
+            try {
+                const aiRes = await fetch('api/ai_chat.php', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ message: text }),
+                });
+
+                const aiData = await aiRes.json();
+                typingIndicator.style.display = 'none';
+
+                if (aiData.response) {
+                    // Save AI response to DB so admin can see it
+                    await fetch('api/chat_action.php?action=send', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ room_id: roomId, message: aiData.response, role: 'admin' }) // Role admin/bot to appear on left
+                    });
+                    loadMessages();
+                }
+            } catch (error) {
+                typingIndicator.style.display = 'none';
+                console.error('AI Chat Error:', error);
+            }
         }
     };
 
