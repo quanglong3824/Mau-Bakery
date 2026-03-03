@@ -39,11 +39,15 @@ class AIHelper {
 
         $ch = curl_init($this->apiUrl);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        
+        // Cấu hình Header tối ưu cho Alibaba International
+        $headers = [
             'Content-Type: application/json',
-            'Authorization: Bearer ' . $this->apiKey,
-            'X-DashScope-OpenAI-Compatible: enable' // Bắt buộc cho DashScope OpenAI compatible
-        ]);
+            'Authorization: Bearer ' . $this->apiKey, // Chuẩn OpenAI
+            'dashscope-api-key: ' . $this->apiKey,    // Chuẩn riêng của Alibaba (đôi khi bắt buộc)
+        ];
+
+        curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($ch, CURLOPT_POST, true);
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
