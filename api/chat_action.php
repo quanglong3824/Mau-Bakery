@@ -96,6 +96,22 @@ try {
         echo json_encode(['success' => true, 'count' => (int)$count]);
     }
 
+    // 5. XOÁ LỊCH SỬ CHAT (Cho User)
+    elseif ($action === 'delete') {
+        $room_id = $_GET['room_id'] ?? null;
+        if (!$room_id) throw new Exception("Thiếu Room ID");
+
+        // Xoá tất cả tin nhắn trong room
+        $stmt = $conn->prepare("DELETE FROM chat_messages WHERE room_id = ?");
+        $stmt->execute([$room_id]);
+
+        // Cập nhật lại thông tin Room
+        $stmt = $conn->prepare("UPDATE chat_rooms SET last_message = '', updated_at = NOW() WHERE id = ?");
+        $stmt->execute([$room_id]);
+
+        echo json_encode(['success' => true, 'message' => 'Đã xoá lịch sử chat']);
+    }
+
 } catch (Exception $e) {
     echo json_encode(['success' => false, 'message' => $e->getMessage()]);
 }

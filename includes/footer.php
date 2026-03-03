@@ -47,7 +47,6 @@
             <div style="display: flex; align-items: center; gap: 10px;">
                 <h3 style="margin:0; font-size:16px;"><i class="fas fa-birthday-cake"></i> Mâu Bakery Chat</h3>
             </div>
-            <div style="display: flex; align-items: center; gap: 10px;">
                 <div class="ai-status-indicator" style="display: flex; align-items: center; gap: 8px; font-size: 11px; background: rgba(0,0,0,0.1); padding: 4px 10px; border-radius: 15px;">
                     <span id="chat-mode-label">AI Trợ Lý</span>
                     <label class="switch" style="position: relative; display: inline-block; width: 34px; height: 18px; margin: 0;">
@@ -55,6 +54,7 @@
                         <span class="slider round"></span>
                     </label>
                 </div>
+                <span id="clear-chat-history" title="Xoá lịch sử chat" style="cursor:pointer; font-size: 14px; opacity: 0.8; transition: 0.3s;"><i class="fas fa-trash-alt"></i></span>
                 <span class="ai-chatbot-close" style="cursor:pointer; font-size: 18px;"><i class="fas fa-times"></i></span>
             </div>
         </div>

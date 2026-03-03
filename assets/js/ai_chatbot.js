@@ -9,8 +9,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const typingIndicator = document.getElementById('ai-typing');
     const aiModeToggle = document.getElementById('ai-mode-toggle');
     const modeLabel = document.getElementById('chat-mode-label');
+    const clearBtn = document.getElementById('clear-chat-history');
 
     if (!toggle) return;
+
+    // Clear history
+    if (clearBtn) {
+        clearBtn.addEventListener('click', async () => {
+            if (!roomId) return;
+            if (confirm('Bạn có chắc chắn muốn xoá toàn bộ lịch sử trò chuyện này?')) {
+                try {
+                    const res = await fetch(`api/chat_action.php?action=delete&room_id=${roomId}`);
+                    const data = await res.json();
+                    if (data.success) {
+                        messagesContainer.innerHTML = '<div class="ai-message bot">Đã xoá lịch sử. Mâu Bakery có thể giúp gì thêm cho bạn?</div>';
+                        lastMessageCount = 0;
+                    }
+                } catch (e) {
+                    console.error("Xoá thất bại", e);
+                }
+            }
+        });
+    }
 
     // Listen for toggle changes
     aiModeToggle.addEventListener('change', function() {
