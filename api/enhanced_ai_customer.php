@@ -1,7 +1,6 @@
 <?php
 /**
- * API for Customer AI Chat (Public/Customer only)
- * Updated to use enhanced functionality
+ * Enhanced API for Customer AI Chat with structured responses
  */
 session_start();
 require_once __DIR__ . '/../config/db.php';
@@ -12,6 +11,7 @@ header('Content-Type: application/json');
 try {
     $input = json_decode(file_get_contents('php://input'), true);
     $message = isset($input['message']) ? trim($input['message']) : '';
+    $user_state = isset($input['state']) ? $input['state'] : 'initial'; // Track conversation state
 
     if (empty($message)) {
         echo json_encode(['error' => 'Tin nhắn không được để trống']);
@@ -19,21 +19,17 @@ try {
     }
 
     $ai = new AIHelper($conn);
-    // Use the enhanced customer chat handler
-    $response_data = $ai->handleEnhancedCustomerChat($message);
+    
+    // Enhanced response that can include structured data
+    $response_data = $ai->handleEnhancedCustomerChat($message, $user_state);
 
     if (!$response_data) {
         echo json_encode(['error' => 'AI không trả về kết quả']);
     } else {
-        // Convert structured response to legacy format if needed for compatibility
-        if (isset($response_data['type'])) {
-            echo json_encode($response_data);
-        } else {
-            echo json_encode(['response' => $response_data]);
-        }
+        echo json_encode($response_data);
     }
 } catch (Exception $e) {
-    error_log("AI Customer Error: " . $e->getMessage());
+    error_log("Enhanced AI Customer Error: " . $e->getMessage());
     echo json_encode(['error' => 'Có lỗi xảy ra: ' . $e->getMessage()]);
 }
 ?>

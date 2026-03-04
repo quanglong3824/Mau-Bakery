@@ -131,3 +131,78 @@
     margin-bottom: 5px;
     display: none;
 }
+
+/* Additional styles for enhanced features */
+.ai-message.bot .product-list-container {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.ai-message.bot .product-item {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    border: 1px solid #eee;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background: white;
+}
+
+.ai-message.bot img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.ai-message.bot .quick-replies {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.ai-message.bot .quick-replies button {
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    padding: 6px 12px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.ai-message.bot .quick-replies button:hover {
+    background: #e0e0e0;
+}
+
+.ai-message.bot form {
+    margin-top: 15px;
+}
+
+.ai-message.bot form input,
+.ai-message.bot form textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    margin-bottom: 10px;
+}
+
+.ai-message.bot form button {
+    background: #ff7e5f;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.ai-message.bot .order-success {
+    margin-top: 15px;
+    padding: 15px;
+    background: #e8f5e9;
+    border-radius: 8px;
+    border: 1px solid #c8e6c9;
+}

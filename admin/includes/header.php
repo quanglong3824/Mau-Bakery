@@ -35,7 +35,7 @@
                 if ($_SESSION['role'] !== 'staff') return false;
                 
                 // Pages allowed for all staff
-                $always_allowed = ['index.php', 'reset_password.php', 'support.php'];
+                $always_allowed = ['index.php', 'reset_password.php', 'support.php', 'ai_statistics.php', 'ai_advisor.php'];
                 if (in_array($page, $always_allowed)) return true;
                 
                 // Check DB for other pages
@@ -60,6 +60,20 @@
             <a href="statistics.php"
                 class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'statistics.php') ? 'active' : ''; ?>">
                 <i class="fas fa-chart-pie"></i> Thống Kê
+            </a>
+            <?php endif; ?>
+
+            <?php if (has_menu_permission('ai_statistics.php')): ?>
+            <a href="ai_statistics.php"
+                class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'ai_statistics.php') ? 'active' : ''; ?>">
+                <i class="fas fa-brain"></i> AI Thống Kê
+            </a>
+            <?php endif; ?>
+
+            <?php if (has_menu_permission('ai_advisor.php')): ?>
+            <a href="ai_advisor.php"
+                class="menu-item <?php echo (basename($_SERVER['PHP_SELF']) == 'ai_advisor.php') ? 'active' : ''; ?>">
+                <i class="fas fa-robot"></i> AI Cố Vấn
             </a>
             <?php endif; ?>
 
